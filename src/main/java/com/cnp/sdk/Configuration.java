@@ -4,7 +4,7 @@ import java.io.File;
 
 public class Configuration {
 	
-	private static final String CHARGEBACK_SDK_CONFIG = ".cnp_SDK_config.properties";
+	private static final String CHARGEBACK_SDK_CONFIG = ".chargeback_SDK_config.properties";
 
 	public File location() {
 		File file = new File(System.getProperty("user.home") + File.separator + CHARGEBACK_SDK_CONFIG);

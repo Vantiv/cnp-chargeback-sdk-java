@@ -8,9 +8,11 @@ import java.util.Properties;
 public class ChargebackRetrieval {
 
     private Properties config;
+    private Communication communication;
 
     public ChargebackRetrieval() {
 
+        communication = new Communication();
         FileInputStream fileInputStream = null;
 
         try {
@@ -59,18 +61,57 @@ public class ChargebackRetrieval {
         this.config = config;
     }
 
-    public String getRetrievalResponse(String key, String value){
-        String xml = " ";
+    private String getRetrievalResponse(String key, String value){
+        String urlSuffix = "chargebacks/?" + key + "=" + value;
+        String xml = communication.getRequest(config, urlSuffix);
         return xml;
     }
 
-    public String getRetrievalResponse(String key, String value, String key2, String value2){
-        String xml = "";
+    private String getRetrievalResponse(String key1, String value1, String key2, String value2){
+        String urlSuffix = "chargebacks/?" + key1 + "=" + value1 + "&" + key2 + "=" + value2;
+        String xml = communication.getRequest(config, urlSuffix);
         return xml;
     }
 
-    public String getRetrievalResponse(String caseId){
-        String xml = "";
+    private String getRetrievalResponse(String caseId){
+        String urlSuffix = "chargebacks/" + caseId;
+        String xml = communication.getRequest(config, urlSuffix);
         return xml;
+    }
+
+    public String getChargebacksByDate(String date){
+        return getRetrievalResponse("date", date);
+    }
+
+    public String getChargebacksByFinancialImpact(String date, Boolean impact){
+        return getRetrievalResponse("date", date, "financialOnly", impact.toString());
+    }
+
+    public String getActivityByActionable(Boolean actionable){
+        return getRetrievalResponse("actionable", actionable.toString());
+    }
+
+    public String getActivityByCaseId(String caseId){
+        return getRetrievalResponse(caseId);
+    }
+
+    public String getActivityByToken(String token){
+        return getRetrievalResponse("token", token);
+    }
+
+    public String getActivityByCardNum(String cardNum, String expDate){
+        return getRetrievalResponse("cardNumber", cardNum, "expirationDate", expDate);
+    }
+
+    public String getActivityByARN(String arn){
+        return getRetrievalResponse("arn", arn);
+    }
+
+    //TODO: methods should return response object
+
+    public static void main(String[] args) {
+        ChargebackRetrieval r = new ChargebackRetrieval();
+//        System.out.println(r.getChargebacksByDate("2018-01-30"));
+        System.out.println(r.getChargebacksByFinancialImpact("2018-01-30", true));
     }
 }

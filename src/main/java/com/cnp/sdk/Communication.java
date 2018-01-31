@@ -14,6 +14,7 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -30,6 +31,7 @@ import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
+import org.apache.commons.codec.binary.Base64;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
@@ -94,7 +96,7 @@ public class Communication {
         return null;
     }
 
-    public String requestToServer(String xmlRequest, Properties configuration) {
+    public String postRequest(String xmlRequest, Properties configuration) {
         String xmlResponse;
         String proxyHost = configuration.getProperty("proxyHost");
         String proxyPort = configuration.getProperty("proxyPort");
@@ -117,6 +119,7 @@ public class Communication {
         }
 
         HttpPost post = new HttpPost(configuration.getProperty("url"));
+        //TODO: fix header
         post.setHeader("Content-Type", "application/xml;charset=\"UTF-8\"");
         if(!httpKeepAlive) {
             post.setHeader("Connection", "close");
@@ -159,6 +162,83 @@ public class Communication {
         }
         return xmlResponse;
     }
+
+    public String getRequest(Properties configuration, String urlSuffix) {
+        String xmlResponse;
+        String proxyHost = configuration.getProperty("proxyHost");
+        String proxyPort = configuration.getProperty("proxyPort");
+        boolean httpKeepAlive = Boolean.valueOf(configuration.getProperty("httpKeepAlive", "false"));
+        int httpTimeout = Integer.valueOf(configuration.getProperty("timeout", "6000"));
+        HttpHost proxy;
+        RequestConfig requestConfig;
+        if (proxyHost != null && proxyHost.length() > 0 && proxyPort != null && proxyHost.length() > 0) {
+            proxy = new HttpHost(proxyHost, Integer.valueOf(proxyPort));
+            requestConfig = RequestConfig.copy(RequestConfig.DEFAULT)
+                    .setProxy(proxy)
+                    .setSocketTimeout(httpTimeout)
+                    .setConnectTimeout(httpTimeout)
+                    .build();
+        } else {
+            requestConfig = RequestConfig.copy(RequestConfig.DEFAULT)
+                    .setSocketTimeout(httpTimeout)
+                    .setConnectTimeout(httpTimeout)
+                    .build();
+        }
+
+        String requestUrl = configuration.getProperty("url") + urlSuffix;
+        System.out.println(requestUrl);
+        HttpGet get = new HttpGet(requestUrl);
+//        get.setHeader("Host", configuration.getProperty("url"));
+        String username = configuration.getProperty("username");
+        String password = configuration.getProperty("password");
+        String authCode = new String(Base64.encodeBase64((username + ":" + password).getBytes()));
+        get.setHeader("Authorization", "Basic " + authCode);
+        get.setHeader("Content-Type", "application/com.vantivcnp.services-v2+xml");
+        get.setHeader("Accept", "application/com.vantivcnp.services-v2+xml");
+        if(!httpKeepAlive) {
+            get.setHeader("Connection", "close");
+        }
+
+        get.setConfig(requestConfig);
+        HttpEntity entity = null;
+        try {
+            boolean printxml = "true".equalsIgnoreCase(configuration.getProperty("printxml"));
+            boolean neuterXml = "true".equalsIgnoreCase(configuration.getProperty("neuterXml"));
+            if (printxml) {
+                if (neuterXml) {
+//                    xmlRequest = neuterXml(xmlRequest);
+                }
+                System.out.println("Get Request sent to: ");
+            }
+//            post.setEntity(new StringEntity(xmlRequest,"UTF-8"));
+
+            HttpResponse response = httpClient.execute(get);
+            entity = response.getEntity();
+            if (response.getStatusLine().getStatusCode() != 200) {
+                System.out.println(EntityUtils.toString(entity,"UTF-8"));
+                throw new ChargebackException(response.getStatusLine().getStatusCode() + ":" +
+                        response.getStatusLine().getReasonPhrase());
+            }
+            xmlResponse = EntityUtils.toString(entity,"UTF-8");
+
+            if (printxml) {
+                if (neuterXml) {
+                    xmlResponse = neuterXml(xmlResponse);
+                }
+                System.out.println("Response XML: " + xmlResponse);
+            }
+        } catch (IOException e) {
+            throw new ChargebackException("Exception connection to Vantiv", e);
+        } finally {
+            if (entity != null) {
+                EntityUtils.consumeQuietly(entity);
+            }
+            get.abort();
+        }
+        return xmlResponse;
+    }
+
+    //TODO: put request
 
     /**
      * This method is exclusively used for sending batch file to the communicator.
