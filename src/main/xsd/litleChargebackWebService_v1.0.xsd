@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<<<<<<< HEAD
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"   elementFormDefault="qualified">
+=======
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.chargebackDocument.com/schema" xmlns:tns="http://www.chargebackDocument.com/schema" elementFormDefault="qualified">
+    >>>>>>> 9dbc05aeb6a02d920b13d51a0197e46130bf3d3c
+    <xs:group name="Result">
+        <xs:sequence>
+            <xs:element name="ResponseCode" type="xs:string" />
+            <xs:element name="ResponseMessage" type="xs:string" />
+        </xs:sequence>
+    </xs:group>
+
+    <xs:element name="Document">
+        <xs:complexType>
+            <xs:group ref="tns:Result" />
+            <xs:attribute name="id" type="xs:string" use="required" />
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Merchant">
+        <xs:complexType>
+            <xs:all>
+                <xs:element ref="tns:ChargebackCase" />
+            </xs:all>l
+            <xs:attribute name="id" type="xs:string" use="required" />
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="ChargebackCase">
+        <xs:complexType>
+            <xs:choice>
+                <xs:group ref="tns:Result" />
+                <xs:element name="DocumentEntry" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:attribute name="id" type="xs:string" use="required" />
+                    </xs:complexType>
+                </xs:element>
+                <xs:element ref="tns:Document" />
+            </xs:choice>
+            <xs:attribute name="id" type="xs:string" use="required" />
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>
