@@ -1,0 +1,11 @@
+#.project
+bin/
+build/
+.gradle
+.classpath
+.project
+.settings/
+.idea/
+cnp-chargeback-sdk-java.iml
+out/
+sample.xml
