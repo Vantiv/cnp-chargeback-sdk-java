@@ -16,6 +16,7 @@ import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
@@ -238,6 +239,81 @@ public class Communication {
         return xmlResponse;
     }
 
+
+    public String putRequest(Properties configuration, String urlSuffix, String xmlRequest) {
+        String xmlResponse;
+        String proxyHost = configuration.getProperty("proxyHost");
+        String proxyPort = configuration.getProperty("proxyPort");
+        boolean httpKeepAlive = Boolean.valueOf(configuration.getProperty("httpKeepAlive", "false"));
+        int httpTimeout = Integer.valueOf(configuration.getProperty("timeout", "6000"));
+        HttpHost proxy;
+        RequestConfig requestConfig;
+        if (proxyHost != null && proxyHost.length() > 0 && proxyPort != null && proxyHost.length() > 0) {
+            proxy = new HttpHost(proxyHost, Integer.valueOf(proxyPort));
+            requestConfig = RequestConfig.copy(RequestConfig.DEFAULT)
+                    .setProxy(proxy)
+                    .setSocketTimeout(httpTimeout)
+                    .setConnectTimeout(httpTimeout)
+                    .build();
+        } else {
+            requestConfig = RequestConfig.copy(RequestConfig.DEFAULT)
+                    .setSocketTimeout(httpTimeout)
+                    .setConnectTimeout(httpTimeout)
+                    .build();
+        }
+
+        String requestUrl = configuration.getProperty("url") + urlSuffix;
+        System.out.println(requestUrl);
+        HttpPut put = new HttpPut(requestUrl);
+//        get.setHeader("Host", configuration.getProperty("url"));
+        String username = configuration.getProperty("username");
+        String password = configuration.getProperty("password");
+        String authCode = new String(Base64.encodeBase64((username + ":" + password).getBytes()));
+        put.setHeader("Authorization", "Basic " + authCode);
+        put.setHeader("Content-Type", "application/com.vantivcnp.services-v2+xml");
+        put.setHeader("Accept", "application/com.vantivcnp.services-v2+xml");
+        if(!httpKeepAlive) {
+            put.setHeader("Connection", "close");
+        }
+
+        put.setConfig(requestConfig);
+        HttpEntity entity = null;
+        try {
+            boolean printxml = "true".equalsIgnoreCase(configuration.getProperty("printxml"));
+            boolean neuterXml = "true".equalsIgnoreCase(configuration.getProperty("neuterXml"));
+            if (printxml) {
+                if (neuterXml) {
+                    xmlRequest = neuterXml(xmlRequest);
+                }
+                System.out.println("Request XML: " + xmlRequest);
+            }
+            put.setEntity(new StringEntity(xmlRequest,"UTF-8"));
+
+            HttpResponse response = httpClient.execute(put);
+            entity = response.getEntity();
+            if (response.getStatusLine().getStatusCode() != 200) {
+                System.out.println(EntityUtils.toString(entity,"UTF-8"));
+                throw new ChargebackException(response.getStatusLine().getStatusCode() + ":" +
+                        response.getStatusLine().getReasonPhrase());
+            }
+            xmlResponse = EntityUtils.toString(entity,"UTF-8");
+
+            if (printxml) {
+                if (neuterXml) {
+                    xmlResponse = neuterXml(xmlResponse);
+                }
+                System.out.println("Response XML: " + xmlResponse);
+            }
+        } catch (IOException e) {
+            throw new ChargebackException("Exception connection to Vantiv", e);
+        } finally {
+            if (entity != null) {
+                EntityUtils.consumeQuietly(entity);
+            }
+            put.abort();
+        }
+        return xmlResponse;
+    }
     //TODO: put request
 
     /**
