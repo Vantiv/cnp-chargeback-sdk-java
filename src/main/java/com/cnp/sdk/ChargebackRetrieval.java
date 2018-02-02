@@ -67,60 +67,56 @@ public class ChargebackRetrieval {
         this.config = config;
     }
 
-    private String sendRetrievalRequest(String key, String value){
+    private ChargebackRetrievalResponse getRetrievalReposnse(String key, String value){
         String urlSuffix = "chargebacks/?" + key + "=" + value;
-        String xml = communication.getRequest(config, urlSuffix);
-        return xml;
+        String response = sendRetrievalRequest(urlSuffix);
+        return XMLConverter.generateRetrievalResponse(response);
     }
 
-    private String sendRetrievalRequest(String key1, String value1, String key2, String value2){
+    private ChargebackRetrievalResponse getRetrievalReposnse(String key1, String value1, String key2, String value2){
         String urlSuffix = "chargebacks/?" + key1 + "=" + value1 + "&" + key2 + "=" + value2;
-        String xml = communication.getRequest(config, urlSuffix);
-        return xml;
+        String response = sendRetrievalRequest(urlSuffix);
+        return XMLConverter.generateRetrievalResponse(response);
     }
 
-    private String sendRetrievalRequest(String caseId){
+    private ChargebackRetrievalResponse getRetrievalReposnse(String caseId){
         String urlSuffix = "chargebacks/" + caseId;
+        String response = sendRetrievalRequest(urlSuffix);
+        return XMLConverter.generateRetrievalResponse(response);
+    }
+
+    private String sendRetrievalRequest(String urlSuffix){
         String xml = communication.getRequest(config, urlSuffix);
         return xml;
     }
 
     public ChargebackRetrievalResponse getChargebacksByDate(String date) throws JAXBException {
-        String response = sendRetrievalRequest("date", date);
-        return XMLConverter.generateRetrievalResponse(response);
+        return getRetrievalReposnse("date", date);
     }
 
     public ChargebackRetrievalResponse getChargebacksByFinancialImpact(String date, Boolean impact){
-        String response = sendRetrievalRequest("date", date, "financialOnly", impact.toString());
-        return XMLConverter.generateRetrievalResponse(response);
+        return getRetrievalReposnse("date", date, "financialOnly", impact.toString());
     }
 
     public ChargebackRetrievalResponse getActivityByActionable(Boolean actionable){
-        String response = sendRetrievalRequest("actionable", actionable.toString());
-        return XMLConverter.generateRetrievalResponse(response);
+        return getRetrievalReposnse("actionable", actionable.toString());
     }
 
     public ChargebackRetrievalResponse getActivityByCaseId(String caseId) throws JAXBException {
-        String response = sendRetrievalRequest(caseId);
-        return XMLConverter.generateRetrievalResponse(response);
+        return getRetrievalReposnse(caseId);
     }
 
     public ChargebackRetrievalResponse getActivityByToken(String token){
-        String response = sendRetrievalRequest("token", token);
-        return XMLConverter.generateRetrievalResponse(response);
+        return getRetrievalReposnse("token", token);
     }
 
     public ChargebackRetrievalResponse getActivityByCardNum(String cardNum, String expDate){
-        String response = sendRetrievalRequest("cardNumber", cardNum, "expirationDate", expDate);
-        return XMLConverter.generateRetrievalResponse(response);
+        return getRetrievalReposnse("cardNumber", cardNum, "expirationDate", expDate);
     }
 
     public ChargebackRetrievalResponse getActivityByARN(String arn){
-        String response = sendRetrievalRequest("arn", arn);
-        return XMLConverter.generateRetrievalResponse(response);
+        return getRetrievalReposnse("arn", arn);
     }
-
-    //TODO: methods should return response object
 
     public static void main(String[] args) throws JAXBException {
         ChargebackRetrieval r = new ChargebackRetrieval();

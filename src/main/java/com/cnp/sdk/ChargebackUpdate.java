@@ -1,7 +1,9 @@
 package com.cnp.sdk;
 
+import com.cnp.sdk.generate.ActivityType;
+import com.cnp.sdk.generate.ChargebackUpdateRequest;
 import com.cnp.sdk.generate.ChargebackUpdateResponse;
-
+import javax.xml.bind.JAXBException;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -49,61 +51,53 @@ public class ChargebackUpdate {
         return xml;
     }
 
-    public ChargebackUpdateResponse assignCaseToUser(String caseId, String userId, String note){
-        String xmlRequest = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                "<chargebackUpdateRequest xmlns=\"http://www.vantivcnp.com/chargebacks\">\n" +
-                "<activityType>ASSIGN_TO_USER</activityType>\n" +
-                "<assignTo>"+userId+"</assignTo>\n" +
-                "<note>"+note+"</note>\n" +
-                "</chargebackUpdateRequest>";
+    private ChargebackUpdateResponse getUpdateResponse(String caseId, ChargebackUpdateRequest request){
+        String xmlRequest = XMLConverter.generateUpdateRequest(request);
         String response = sendUpdateRequest(caseId, xmlRequest);
         return XMLConverter.generateUpdateResponse(response);
     }
 
-    public ChargebackUpdateResponse addNoteToCase(String caseId, String note){
-        String xmlRequest = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                "<chargebackUpdateRequest xmlns=\"http://www.vantivcnp.com/chargebacks\">\n" +
-                "<activityType>ADD_NOTE</activityType>\n" +
-                "<note>"+note+"</note>\n" +
-                "</chargebackUpdateRequest>";
-        String response = sendUpdateRequest(caseId, xmlRequest);
-        return XMLConverter.generateUpdateResponse(response);
+    public ChargebackUpdateResponse assignCaseToUser(String caseId, String userId, String note) throws JAXBException {
+        ChargebackUpdateRequest request = new ChargebackUpdateRequest();
+        request.setActivityType(ActivityType.ASSIGN_TO_USER);
+        request.setAssignedTo(userId);
+        request.setNote(note);
+        return getUpdateResponse(caseId, request);
+    }
+
+    public ChargebackUpdateResponse addNoteToCase(String caseId, String note) throws JAXBException {
+        ChargebackUpdateRequest request = new ChargebackUpdateRequest();
+        request.setActivityType(ActivityType.ADD_NOTE);
+        request.setNote(note);
+        return getUpdateResponse(caseId, request);
     }
 
     public ChargebackUpdateResponse assumeLiability(String caseId, String note){
-        String xmlRequest = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                "<chargebackUpdateRequest xmlns=\"http://www.vantivcnp.com/chargebacks\">\n" +
-                "<activityType>MERCHANT_ACCEPTS_LIABILITY</activityType>\n" +
-                "<note>"+note+"</note>\n" +
-                "</chargebackUpdateRequest>";
-        String response = sendUpdateRequest(caseId, xmlRequest);
-        return XMLConverter.generateUpdateResponse(response);
+        ChargebackUpdateRequest request = new ChargebackUpdateRequest();
+        request.setActivityType(ActivityType.MERCHANT_ACCEPTS_LIABILITY);
+        request.setNote(note);
+        return getUpdateResponse(caseId, request);
     }
 
-    public ChargebackUpdateResponse representCase(String caseId, double representedAmount, String note){
-        String xmlRequest = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                "<chargebackUpdateRequest xmlns=\"http://www.vantivcnp.com/chargebacks\">\n" +
-                "<activityType>MERCHANT_REPRESENT</activityType>\n" +
-                "<note>"+note+"</note>\n" +
-                "<representedAmount>"+representedAmount+"</representedAmount>\n" +
-                "</chargebackUpdateRequest>";
-        String response = sendUpdateRequest(caseId, xmlRequest);
-        return XMLConverter.generateUpdateResponse(response);
+    //TODO: figure out data type for representedAmount
+
+    public ChargebackUpdateResponse representCase(String caseId, Long representedAmount, String note){
+        ChargebackUpdateRequest request = new ChargebackUpdateRequest();
+        request.setActivityType(ActivityType.MERCHANT_REPRESENT);
+        request.setNote(note);
+        request.setRepresentedAmount(representedAmount);
+        return getUpdateResponse(caseId, request);
     }
 
     public ChargebackUpdateResponse respondToRetrievalRequest(String caseId, String note){
-        String xmlRequest = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                "<chargebackUpdateRequest xmlns=\"http://www.vantivcnp.com/chargebacks\">\n" +
-                "<activityType>MERCHANT_RESPOND</activityType>\n" +
-                "<note>"+note+"</note>\n" +
-                "</chargebackUpdateRequest>";
-        String response = sendUpdateRequest(caseId, xmlRequest);
-        return XMLConverter.generateUpdateResponse(response);
+        ChargebackUpdateRequest request = new ChargebackUpdateRequest();
+        request.setActivityType(ActivityType.MERCHANT_RESPOND);
+        request.setNote(note);
+        return getUpdateResponse(caseId, request);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws JAXBException {
         ChargebackUpdate r = new ChargebackUpdate();
         System.out.println(r.addNoteToCase("216004901502", "Test note"));
-
     }
 }
