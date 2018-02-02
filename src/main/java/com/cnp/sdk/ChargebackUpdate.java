@@ -1,5 +1,7 @@
 package com.cnp.sdk;
 
+import com.cnp.sdk.generate.ChargebackUpdateResponse;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -47,51 +49,56 @@ public class ChargebackUpdate {
         return xml;
     }
 
-    public String assignCaseToUser(String caseId, String userId, String note){
+    public ChargebackUpdateResponse assignCaseToUser(String caseId, String userId, String note){
         String xmlRequest = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
                 "<chargebackUpdateRequest xmlns=\"http://www.vantivcnp.com/chargebacks\">\n" +
                 "<activityType>ASSIGN_TO_USER</activityType>\n" +
                 "<assignTo>"+userId+"</assignTo>\n" +
                 "<note>"+note+"</note>\n" +
                 "</chargebackUpdateRequest>";
-        return sendUpdateRequest(caseId, xmlRequest);
+        String response = sendUpdateRequest(caseId, xmlRequest);
+        return XMLConverter.generateUpdateResponse(response);
     }
 
-    public String addNoteToCase(String caseId, String note){
+    public ChargebackUpdateResponse addNoteToCase(String caseId, String note){
         String xmlRequest = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
                 "<chargebackUpdateRequest xmlns=\"http://www.vantivcnp.com/chargebacks\">\n" +
                 "<activityType>ADD_NOTE</activityType>\n" +
                 "<note>"+note+"</note>\n" +
                 "</chargebackUpdateRequest>";
-        return sendUpdateRequest(caseId, xmlRequest);
+        String response = sendUpdateRequest(caseId, xmlRequest);
+        return XMLConverter.generateUpdateResponse(response);
     }
 
-    public String assumeLiability(String caseId, String note){
+    public ChargebackUpdateResponse assumeLiability(String caseId, String note){
         String xmlRequest = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
                 "<chargebackUpdateRequest xmlns=\"http://www.vantivcnp.com/chargebacks\">\n" +
                 "<activityType>MERCHANT_ACCEPTS_LIABILITY</activityType>\n" +
                 "<note>"+note+"</note>\n" +
                 "</chargebackUpdateRequest>";
-        return sendUpdateRequest(caseId, xmlRequest);
+        String response = sendUpdateRequest(caseId, xmlRequest);
+        return XMLConverter.generateUpdateResponse(response);
     }
 
-    public String representCase(String caseId, double representedAmount, String note){
+    public ChargebackUpdateResponse representCase(String caseId, double representedAmount, String note){
         String xmlRequest = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
                 "<chargebackUpdateRequest xmlns=\"http://www.vantivcnp.com/chargebacks\">\n" +
                 "<activityType>MERCHANT_REPRESENT</activityType>\n" +
                 "<note>"+note+"</note>\n" +
                 "<representedAmount>"+representedAmount+"</representedAmount>\n" +
                 "</chargebackUpdateRequest>";
-        return sendUpdateRequest(caseId, xmlRequest);
+        String response = sendUpdateRequest(caseId, xmlRequest);
+        return XMLConverter.generateUpdateResponse(response);
     }
 
-    public String respondToRetrievalRequest(String caseId, String note){
+    public ChargebackUpdateResponse respondToRetrievalRequest(String caseId, String note){
         String xmlRequest = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
                 "<chargebackUpdateRequest xmlns=\"http://www.vantivcnp.com/chargebacks\">\n" +
                 "<activityType>MERCHANT_RESPOND</activityType>\n" +
                 "<note>"+note+"</note>\n" +
                 "</chargebackUpdateRequest>";
-        return sendUpdateRequest(caseId, xmlRequest);
+        String response = sendUpdateRequest(caseId, xmlRequest);
+        return XMLConverter.generateUpdateResponse(response);
     }
 
     public static void main(String[] args) {

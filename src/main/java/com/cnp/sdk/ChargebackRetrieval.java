@@ -87,39 +87,37 @@ public class ChargebackRetrieval {
 
     public ChargebackRetrievalResponse getChargebacksByDate(String date) throws JAXBException {
         String response = sendRetrievalRequest("date", date);
-//        System.out.println(response);
-        JAXBContext jaxbContext = JAXBContext.newInstance(ChargebackRetrievalResponse.class);
-        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-        ChargebackRetrievalResponse que= (ChargebackRetrievalResponse) jaxbUnmarshaller.unmarshal(new StringReader(response));
-        return que;
+        return XMLConverter.generateRetrievalResponse(response);
     }
 
-    public String getChargebacksByFinancialImpact(String date, Boolean impact){
-        return sendRetrievalRequest("date", date, "financialOnly", impact.toString());
+    public ChargebackRetrievalResponse getChargebacksByFinancialImpact(String date, Boolean impact){
+        String response = sendRetrievalRequest("date", date, "financialOnly", impact.toString());
+        return XMLConverter.generateRetrievalResponse(response);
     }
 
-    public String getActivityByActionable(Boolean actionable){
-        return sendRetrievalRequest("actionable", actionable.toString());
+    public ChargebackRetrievalResponse getActivityByActionable(Boolean actionable){
+        String response = sendRetrievalRequest("actionable", actionable.toString());
+        return XMLConverter.generateRetrievalResponse(response);
     }
 
     public ChargebackRetrievalResponse getActivityByCaseId(String caseId) throws JAXBException {
         String response = sendRetrievalRequest(caseId);
-        JAXBContext jaxbContext = JAXBContext.newInstance(ChargebackRetrievalResponse.class);
-        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-        ChargebackRetrievalResponse que= (ChargebackRetrievalResponse) jaxbUnmarshaller.unmarshal(new StringReader(response));
-        return que;
+        return XMLConverter.generateRetrievalResponse(response);
     }
 
-    public String getActivityByToken(String token){
-        return sendRetrievalRequest("token", token);
+    public ChargebackRetrievalResponse getActivityByToken(String token){
+        String response = sendRetrievalRequest("token", token);
+        return XMLConverter.generateRetrievalResponse(response);
     }
 
-    public String getActivityByCardNum(String cardNum, String expDate){
-        return sendRetrievalRequest("cardNumber", cardNum, "expirationDate", expDate);
+    public ChargebackRetrievalResponse getActivityByCardNum(String cardNum, String expDate){
+        String response = sendRetrievalRequest("cardNumber", cardNum, "expirationDate", expDate);
+        return XMLConverter.generateRetrievalResponse(response);
     }
 
-    public String getActivityByARN(String arn){
-        return sendRetrievalRequest("arn", arn);
+    public ChargebackRetrievalResponse getActivityByARN(String arn){
+        String response = sendRetrievalRequest("arn", arn);
+        return XMLConverter.generateRetrievalResponse(response);
     }
 
     //TODO: methods should return response object
