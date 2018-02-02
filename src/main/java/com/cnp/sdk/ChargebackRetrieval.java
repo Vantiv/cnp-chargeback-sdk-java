@@ -1,8 +1,14 @@
 package com.cnp.sdk;
 
+import com.cnp.sdk.generate.ChargebackRetrievalResponse;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.Properties;
 
 public class ChargebackRetrieval {
@@ -79,8 +85,13 @@ public class ChargebackRetrieval {
         return xml;
     }
 
-    public String getChargebacksByDate(String date){
-        return sendRetrievalRequest("date", date);
+    public ChargebackRetrievalResponse getChargebacksByDate(String date) throws JAXBException {
+        String response = sendRetrievalRequest("date", date);
+//        System.out.println(response);
+        JAXBContext jaxbContext = JAXBContext.newInstance(ChargebackRetrievalResponse.class);
+        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+        ChargebackRetrievalResponse que= (ChargebackRetrievalResponse) jaxbUnmarshaller.unmarshal(new StringReader(response));
+        return que;
     }
 
     public String getChargebacksByFinancialImpact(String date, Boolean impact){
@@ -91,8 +102,12 @@ public class ChargebackRetrieval {
         return sendRetrievalRequest("actionable", actionable.toString());
     }
 
-    public String getActivityByCaseId(String caseId){
-        return sendRetrievalRequest(caseId);
+    public ChargebackRetrievalResponse getActivityByCaseId(String caseId) throws JAXBException {
+        String response = sendRetrievalRequest(caseId);
+        JAXBContext jaxbContext = JAXBContext.newInstance(ChargebackRetrievalResponse.class);
+        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+        ChargebackRetrievalResponse que= (ChargebackRetrievalResponse) jaxbUnmarshaller.unmarshal(new StringReader(response));
+        return que;
     }
 
     public String getActivityByToken(String token){
@@ -109,9 +124,10 @@ public class ChargebackRetrieval {
 
     //TODO: methods should return response object
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws JAXBException {
         ChargebackRetrieval r = new ChargebackRetrieval();
-        System.out.println(r.getActivityByCaseId("216004700003"));
+        ChargebackRetrievalResponse re = r.getChargebacksByDate("2018-01-31");
+        System.out.println(re.getChargebackCases().get(0).getActivities().get(0).getNotes());
 
 //        System.out.println(r.getChargebacksByFinancialImpact("2018-01-30", true));
     }
