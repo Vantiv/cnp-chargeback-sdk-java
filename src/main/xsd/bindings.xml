@@ -6,9 +6,9 @@
  	<jaxb:globalBindings generateElementProperty="false">
  		<jaxb:javaType name="java.util.Calendar" xmlType="xs:date"
  			parseMethod="com.cnp.sdk.JAXBConverters.parseDate" printMethod="com.cnp.sdk.JAXBConverters.printDate" />
- 		<!--<jaxb:javaType name="java.lang.Long" xmlType="xp:transactionAmountType"-->
- 			<!--parseMethod="com.litle.sdk.JAXBConverters.parseLong" printMethod="com.litle.sdk.JAXBConverters.printLong" />-->
- 		<jaxb:javaType name="java.lang.String" xmlType="xs:base64Binary"
+ 		<jaxb:javaType name="java.lang.Long" xmlType="xs:long"
+ 			parseMethod="com.cnp.sdk.JAXBConverters.parseLong" printMethod="com.cnp.sdk.JAXBConverters.printLong" />
+ 		<jaxb:javaType name="java.lang.String" xmlType="xs:string"
  			parseMethod="com.cnp.sdk.JAXBConverters.parseString" printMethod="com.cnp.sdk.JAXBConverters.printString" />
  		<xjc:simple />
  	</jaxb:globalBindings>

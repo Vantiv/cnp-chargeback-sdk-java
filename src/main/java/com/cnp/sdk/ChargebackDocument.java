@@ -1,5 +1,6 @@
 package com.cnp.sdk;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -22,7 +23,7 @@ public class ChargebackDocument {
         } catch (FileNotFoundException e) {
             throw new ChargebackException("Configuration file not found." +
                     " If you are not using the .litle_SDK_config.properties file," +
-                    " please use the " + ChargebackRetrieval.class.getSimpleName() + "(Properties) constructor." +
+                    " please use the " + Chargeback.class.getSimpleName() + "(Properties) constructor." +
                     " If you are using .litle_SDK_config.properties, you can generate one using java -jar cnp-chargeback-sdk-java-x.xx.jar", e);
         } catch (IOException e) {
             throw new ChargebackException("Configuration file could not be loaded.  Check to see if the user running this has permission to access the file", e);
@@ -41,32 +42,38 @@ public class ChargebackDocument {
         this.config = config;
     }
 
-//    public String uploadDocument(String caseId, String document){
-//        String urlSuffix = "chargebacks/" + caseId;
-//        String xml = communication.postRequest(config, urlSuffix);
-//        return xml;
-//    }
-
-    public String retrieveDocument(String caseId, String document){
-        String urlSuffix = "chargebacks/" + config.getProperty("merchantId") + "/" + caseId + "/" + document;
-        String xml = communication.getRequest(config, urlSuffix);
+    public String uploadDocument(String caseId, String document){
+        //TODO: fix suffix and test
+        File file = new File(document);
+        String mid = config.getProperty("merchantId");
+        String urlSuffix = "chargebacks/documents/" + mid + "/" + caseId + "/" + file.getName();
+        String xml = communication.postDocumentRequest(file, urlSuffix, config);
         return xml;
     }
 
-//    public String replaceDocument(String caseId, String document){
-//        String urlSuffix = "chargebacks/" + caseId;
-//        String xml = communication.putRequest(config, urlSuffix);
-//        return xml;
-//    }
-//
-//    public String deleteDocument(String caseId, String document){
-//        String urlSuffix = "chargebacks/" + caseId;
-//        String xml = communication.deleteRequest(config, urlSuffix);
-//        return xml;
-//    }
+    public String retrieveDocument(String caseId, String document){
+        String urlSuffix = "chargebacks/documents/" + config.getProperty("merchantId") + "/" + caseId + "/" + document;
+        String xml = communication.getDocumentRequest(config, urlSuffix);
+        return xml;
+    }
+
+    public String replaceDocument(String caseId, String document){
+        File file = new File(document);
+        String mid = config.getProperty("merchantId");
+        String urlSuffix = "chargebacks/documents/" + mid + "/" + caseId + "/" + file.getName();
+        String xml = communication.putDocumentRequest(file, urlSuffix, config);
+        return xml;
+    }
+
+    public String deleteDocument(String caseId, String document){
+        String urlSuffix = "chargebacks/documents/" + config.getProperty("merchantId") + "/" + caseId + "/" + document;
+        String xml = communication.deleteDocumentRequest(config, urlSuffix);
+        return xml;
+    }
 
     public static void main(String[] args) {
         ChargebackDocument r = new ChargebackDocument();
-        System.out.println(r.retrieveDocument("216004901502", "test_note.pdf"));
+//        System.out.println(r.retrieveDocument("216004901502", "test_note.pdf"));
+        System.out.println(r.uploadDocument("216004901502", "document_test.PNG"));
     }
 }
