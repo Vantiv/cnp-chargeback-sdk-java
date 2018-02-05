@@ -11,28 +11,22 @@ import java.io.StringWriter;
 
 public class XMLConverter {
 
-    //TODO: handle JAXBexceptions
-
     public static ChargebackRetrievalResponse generateRetrievalResponse(String xmlResponse){
-        ChargebackRetrievalResponse response = null;
+        ChargebackRetrievalResponse response;
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(ChargebackRetrievalResponse.class);
-            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            response= (ChargebackRetrievalResponse) jaxbUnmarshaller.unmarshal(new StringReader(xmlResponse));
+            response = (ChargebackRetrievalResponse) CnpContext.getJAXBContext().createUnmarshaller().unmarshal(new StringReader(xmlResponse));
         } catch (JAXBException e) {
-            e.printStackTrace();
+            throw new ChargebackException("Error validating xml data against the schema", e);
         }
         return response;
     }
 
     public static ChargebackUpdateResponse generateUpdateResponse(String xmlResponse){
-        ChargebackUpdateResponse response = null;
+        ChargebackUpdateResponse response;
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(ChargebackUpdateResponse.class);
-            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            response= (ChargebackUpdateResponse) jaxbUnmarshaller.unmarshal(new StringReader(xmlResponse));
+            response = (ChargebackUpdateResponse) CnpContext.getJAXBContext().createUnmarshaller().unmarshal(new StringReader(xmlResponse));
         } catch (JAXBException e) {
-            e.printStackTrace();
+            throw new ChargebackException("Error validating xml data against the schema", e);
         }
         return response;
     }
@@ -40,10 +34,9 @@ public class XMLConverter {
     public static String generateUpdateRequest(ChargebackUpdateRequest request){
         StringWriter sw = new StringWriter();
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(ChargebackUpdateRequest.class);
-            jaxbContext.createMarshaller().marshal(request, sw);
+            CnpContext.getJAXBContext().createMarshaller().marshal(request, sw);
         } catch (JAXBException e) {
-            e.printStackTrace();
+            throw new ChargebackException("Error validating xml data against the schema", e);
         }
         return sw.toString();
     }

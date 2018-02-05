@@ -27,9 +27,9 @@ public class Chargeback {
             config.load(fileInputStream);
         } catch (FileNotFoundException e) {
             throw new ChargebackException("Configuration file not found." +
-                    " If you are not using the .litle_SDK_config.properties file," +
+                    " If you are not using the .chargeback_SDK_config.properties file," +
                     " please use the " + Chargeback.class.getSimpleName() + "(Properties) constructor." +
-                    " If you are using .litle_SDK_config.properties, you can generate one using java -jar cnp-chargeback-sdk-java-x.xx.jar", e);
+                    " If you are using .chargeback_SDK_config.properties, you can generate one using java -jar cnp-chargeback-sdk-java-x.xx.jar", e);
         } catch (IOException e) {
             throw new ChargebackException("Configuration file could not be loaded.  Check to see if the user running this has permission to access the file", e);
         } finally {

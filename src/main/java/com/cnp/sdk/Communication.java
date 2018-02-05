@@ -36,19 +36,11 @@ import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.apache.commons.codec.binary.Base64;
 
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SftpException;
-
 public class Communication {
 
     private static final String[] SUPPORTED_PROTOCOLS = new String[] {"TLSv1.1", "TLSv1.2"};
     private static final String NEUTER_STR = "NEUTERED";
     private CloseableHttpClient httpClient;
-    private StreamData streamData;
     private final int KEEP_ALIVE_DURATION = 8000;
 
     public Communication() {
@@ -81,7 +73,6 @@ public class Communication {
                     .setKeepAliveStrategy(keepAliveStrategy)
                     .build();
 
-            streamData = new StreamData();
         } catch (GeneralSecurityException ex) {
             throw new IllegalStateException(ex);
         }
@@ -122,6 +113,7 @@ public class Communication {
         try {
             HttpResponse response = httpClient.execute(get);
             xmlResponse = validateResponse(response);
+            HttpEntity ent = response.getEntity();
             printToConsole(null, xmlResponse, configuration);
         } catch (IOException e) {
             throw new ChargebackException("Exception connection to Vantiv", e);
@@ -348,180 +340,6 @@ public class Communication {
             put.abort();
         }
         return xmlResponse;
-    }
-
-    /**
-     * This method is exclusively used for sending batch file to the communicator.
-     * @param requestFile
-     * @param responseFile
-     * @param configuration
-     * @throws IOException
-     */
-    public void sendLitleBatchFileToIBC(File requestFile, File responseFile, Properties configuration) throws IOException {
-        String hostName = configuration.getProperty("batchHost");
-        String hostPort = configuration.getProperty("batchPort");
-        int tcpTimeout = Integer.parseInt(configuration.getProperty("batchTcpTimeout"));
-        boolean useSSL = configuration.getProperty("batchUseSSL") != null
-                && configuration.getProperty("batchUseSSL").equalsIgnoreCase("true");
-        streamData.init(hostName, hostPort, tcpTimeout, useSSL);
-
-        streamData.dataOut(requestFile);
-
-        streamData.dataIn(responseFile);
-
-        streamData.closeSocket();
-    }
-
-    /**
-     * This method sends the request file to Litle's server sFTP
-     * @param requestFile
-     * @param configuration
-     * @throws IOException
-     */
-    public void sendLitleRequestFileToSFTP(File requestFile, Properties configuration) throws IOException{
-        String username = configuration.getProperty("sftpUsername");
-        String password = configuration.getProperty("sftpPassword");
-        String hostname = configuration.getProperty("batchHost");
-
-        java.util.Properties config = new java.util.Properties();
-        config.put("StrictHostKeyChecking", "no");
-        JSch jsch = null;
-        Session session = null;
-        try{
-            jsch = new JSch();
-            session = jsch.getSession(username, hostname);
-            session.setConfig(config);
-            session.setPassword(password);
-
-            session.connect();
-        }
-        catch(JSchException e){
-            throw new ChargebackException("Exception connection to Litle", e);
-        }
-
-        Channel channel = null;
-
-        try{
-            channel = session.openChannel("sftp");
-            channel.connect();
-        }
-        catch(JSchException e){
-            throw new ChargebackException("Exception connection to Litle", e);
-        }
-
-        ChannelSftp sftp = (ChannelSftp) channel;
-        boolean printxml = configuration.getProperty("printxml") != null
-                && configuration.getProperty("printxml").equalsIgnoreCase(
-                "true");
-
-        if(printxml){
-            BufferedReader reader = new BufferedReader(new FileReader(requestFile));
-            String line = "";
-            while((line = reader.readLine()) != null){
-                System.out.println(line);
-            }
-            reader.close();
-        }
-
-        try {
-            sftp.put(requestFile.getAbsolutePath(), "inbound/" + requestFile.getName() + ".prg");
-            sftp.rename("inbound/" + requestFile.getName() + ".prg", "inbound/" + requestFile.getName() + ".asc");
-        }
-        catch (SftpException e) {
-            throw new ChargebackException("Exception SFTP operation", e);
-        }
-
-        channel.disconnect();
-        session.disconnect();
-    }
-
-    /**
-     * Grabs the response file from Litle's sFTP server. This method is blocking! It will continue to poll until the timeout has elapsed
-     * or the file has been retrieved!
-     * @param requestFile
-     * @param responseFile
-     * @param configuration
-     * @throws IOException
-     */
-    public void receiveLitleRequestResponseFileFromSFTP(File requestFile, File responseFile, Properties configuration) throws IOException{
-        String username = configuration.getProperty("sftpUsername");
-        String password = configuration.getProperty("sftpPassword");
-        String hostname = configuration.getProperty("batchHost");
-
-        java.util.Properties config = new java.util.Properties();
-        config.put("StrictHostKeyChecking", "no");
-        JSch jsch = null;
-        Session session = null;
-        try{
-            jsch = new JSch();
-            session = jsch.getSession(username, hostname);
-            session.setConfig(config);
-            session.setPassword(password);
-
-            session.connect();
-        }
-        catch(JSchException e){
-            throw new ChargebackException("Exception connection to Litle", e);
-        }
-
-        Channel channel = null;
-
-        try{
-            channel = session.openChannel("sftp");
-            channel.connect();
-        }
-        catch(JSchException e){
-            throw new ChargebackException("Exception connection to Litle", e);
-        }
-
-        ChannelSftp sftp = (ChannelSftp) channel;
-
-        Long start = System.currentTimeMillis();
-        Long timeout = Long.parseLong(configuration.getProperty("sftpTimeout"));
-        System.out.println("Retrieving from sFTP...");
-        while(System.currentTimeMillis() - start < timeout){
-            try {
-                Thread.sleep(45000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            boolean success = true;
-            try{
-                sftp.get("outbound/" + requestFile.getName() + ".asc", responseFile.getAbsolutePath());
-            }
-            catch(SftpException e){
-                success = false;
-                System.out.println(e);
-            }
-            if(success) {
-                try {
-                    sftp.rm("outbound/" + requestFile.getName() + ".asc");
-                } catch (SftpException e) {
-                    throw new ChargebackException("Exception SFTP operation", e);
-                }
-                break;
-            }
-            System.out.print(".");
-        }
-        boolean printxml = configuration.getProperty("printxml") != null
-                && configuration.getProperty("printxml").equalsIgnoreCase(
-                "true");
-        if(printxml){
-            BufferedReader reader = new BufferedReader(new FileReader(responseFile));
-            String line = "";
-            while((line = reader.readLine()) != null){
-                System.out.println(line);
-            }
-            reader.close();
-        }
-
-        channel.disconnect();
-        session.disconnect();
-    }
-
-
-    void setStreamData(StreamData streamData) {
-        this.streamData = streamData;
     }
 
     /* Method to neuter out sensitive information from xml */
