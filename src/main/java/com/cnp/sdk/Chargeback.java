@@ -181,6 +181,6 @@ public class Chargeback {
 
 
         Chargeback r = new Chargeback();
-        System.out.println(r.addNoteToCase("216004901502", "Test note"));
+        System.out.println(r.addNoteToCase("216002100701", "Test note"));
     }
 }

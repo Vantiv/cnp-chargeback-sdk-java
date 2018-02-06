@@ -1,9 +1,6 @@
 package com.cnp.sdk;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.security.GeneralSecurityException;
 import java.util.Properties;
 
@@ -90,11 +87,11 @@ public class Communication {
         return null;
     }
 
+    //TODO: fix headers
 
-    public String getDocumentRequest(Properties configuration, String urlSuffix) {
-        String xmlResponse;
-
-        boolean httpKeepAlive = Boolean.valueOf(configuration.getProperty("httpKeepAlive", "false"));
+    public File getDocumentRequest(String documentId, Properties configuration, String urlSuffix) {
+        File document = null;
+        boolean httpKeepAlive = Boolean.valueOf(configuration.getProperty("httpKeepAlive", "true"));
         RequestConfig requestConfig = generateRequestConfig(configuration);
 
         String requestUrl = configuration.getProperty("url") + urlSuffix;
@@ -103,24 +100,31 @@ public class Communication {
         String password = configuration.getProperty("password");
         String authCode = new String(Base64.encodeBase64((username + ":" + password).getBytes()));
         get.setHeader("Authorization", "Basic " + authCode);
-        get.setHeader("Content-Type", "image");
         if(!httpKeepAlive) {
             get.setHeader("Connection", "close");
         }
 
         get.setConfig(requestConfig);
 
+        HttpEntity entity = null;
         try {
             HttpResponse response = httpClient.execute(get);
-            xmlResponse = validateResponse(response);
-            HttpEntity ent = response.getEntity();
-            printToConsole(null, xmlResponse, configuration);
+            entity = response.getEntity();
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new ChargebackException(response.getStatusLine().getStatusCode() + ":" +
+                        response.getStatusLine().getReasonPhrase());
+            }
+            document = new File(documentId);
+            entity.writeTo(new FileOutputStream(document));
         } catch (IOException e) {
             throw new ChargebackException("Exception connection to Vantiv", e);
         } finally {
+            if (entity != null) {
+                EntityUtils.consumeQuietly(entity);
+            }
             get.abort();
         }
-        return xmlResponse;
+        return document;
     }
 
     public String postDocumentRequest(File file, String urlSuffix, Properties configuration) {
@@ -128,13 +132,14 @@ public class Communication {
         boolean httpKeepAlive = Boolean.valueOf(configuration.getProperty("httpKeepAlive", "false"));
         RequestConfig requestConfig = generateRequestConfig(configuration);
         String requestUrl = configuration.getProperty("url") + urlSuffix;
+        System.out.println(requestUrl);
         HttpPost post = new HttpPost(requestUrl);
         String username = configuration.getProperty("username");
         String password = configuration.getProperty("password");
         String authCode = new String(Base64.encodeBase64((username + ":" + password).getBytes()));
         post.setHeader("Authorization", "Basic " + authCode);
-        post.setHeader("Content-Type", "image");
-//        post.setHeader("Content-Length", "application/com.vantivcnp.services-v2+xml");
+        post.setHeader("Content-Type", "image/png");
+//        post.setHeader("Content-Length", new String(file.getTotalSpace()));
         if(!httpKeepAlive) {
             post.setHeader("Connection", "close");
         }
@@ -143,7 +148,7 @@ public class Communication {
         try {
             post.setEntity(new FileEntity(file));
             HttpResponse response = httpClient.execute(post);
-            xmlResponse = validateResponse(response);
+            xmlResponse = validateDocumentResponse(response);
             printToConsole(null, xmlResponse, configuration);
         } catch (IOException e) {
             throw new ChargebackException("Exception connection to Litle", e);
@@ -173,10 +178,10 @@ public class Communication {
         try {
             put.setEntity(new FileEntity(file));
             HttpResponse response = httpClient.execute(put);
-            xmlResponse = validateResponse(response);
+            xmlResponse = validateDocumentResponse(response);
             printToConsole(null, xmlResponse, configuration);
         } catch (IOException e) {
-            throw new ChargebackException("Exception connection to Litle", e);
+            throw new ChargebackException("Exception connection to Vantiv", e);
         } finally {
             put.abort();
         }
@@ -204,7 +209,7 @@ public class Communication {
 
         try {
             HttpResponse response = httpClient.execute(delete);
-            xmlResponse = validateResponse(response);
+            xmlResponse = validateDocumentResponse(response);
             printToConsole(null, xmlResponse, configuration);
         } catch (IOException e) {
             throw new ChargebackException("Exception connection to Vantiv", e);
@@ -237,6 +242,29 @@ public class Communication {
     }
 
     private String validateResponse(HttpResponse response){
+        HttpEntity entity = null;
+        String xmlResponse;
+        try{
+            entity = response.getEntity();
+            if (response.getStatusLine().getStatusCode() != 200) {
+                System.out.println(EntityUtils.toString(entity,"UTF-8"));
+                throw new ChargebackException(response.getStatusLine().getStatusCode() + ":" +
+                        response.getStatusLine().getReasonPhrase());
+            }
+            xmlResponse = EntityUtils.toString(entity,"UTF-8");
+        }
+        catch (IOException e) {
+            throw new ChargebackException("Exception connection to Vantiv", e);
+        }
+        finally {
+            if (entity != null) {
+                EntityUtils.consumeQuietly(entity);
+            }
+        }
+        return xmlResponse;
+    }
+
+    private String validateDocumentResponse(HttpResponse response){
         HttpEntity entity = null;
         String xmlResponse;
         try{

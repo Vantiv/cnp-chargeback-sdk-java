@@ -47,27 +47,27 @@ public class ChargebackDocument {
     public String uploadDocument(String caseId, File document){
         //TODO: fix suffix and test
         String mid = config.getProperty("merchantId");
-        String urlSuffix = "chargebacks/documents/" + mid + "/" + caseId + "/" + document.getName();
+//        String urlSuffix = "chargebacks/documents/" + mid + "/" + caseId + "/" + document.getName();
+        String urlSuffix = "chargebacks/upload/" + caseId + "/" + document.getName();
         String xml = communication.postDocumentRequest(document, urlSuffix, config);
         return xml;
     }
 
     public File retrieveDocument(String caseId, String documentId){
-        File file = null;
-        String urlSuffix = "chargebacks/documents/" + config.getProperty("merchantId") + "/" + caseId + "/" + documentId;
-        String xml = communication.getDocumentRequest(config, urlSuffix);
+        String urlSuffix = "chargebacks/retrieve/" + caseId + "/" + documentId;
+        File file = communication.getDocumentRequest(documentId, config, urlSuffix);
         return file;
     }
 
     public String replaceDocument(String caseId, File document){
         String mid = config.getProperty("merchantId");
-        String urlSuffix = "chargebacks/documents/" + mid + "/" + caseId + "/" + document.getName();
+        String urlSuffix = "chargebacks/replace/" + caseId + "/" + document.getName();
         String xml = communication.putDocumentRequest(document, urlSuffix, config);
         return xml;
     }
 
     public String deleteDocument(String caseId, String documentId){
-        String urlSuffix = "chargebacks/documents/" + config.getProperty("merchantId") + "/" + caseId + "/" + documentId;
+        String urlSuffix = "chargebacks/remove/" + caseId + "/" + documentId;
         String xml = communication.deleteDocumentRequest(config, urlSuffix);
         return xml;
     }
@@ -76,6 +76,9 @@ public class ChargebackDocument {
         ChargebackDocument r = new ChargebackDocument();
 //        System.out.println(r.retrieveDocument("216004901502", "test_note.pdf"));
         File file = new File("document_test.PNG");
-        System.out.println(r.uploadDocument("216004901502", file));
+//        System.out.println(r.uploadDocument("216002100701", file));
+        System.out.println(r.retrieveDocument("216002100701", "document_test.PNG"));
+//        System.out.println(r.replaceDocument("216002100701", file));
+//        System.out.println(r.deleteDocument("216002100701", "document_test.PNG"));
     }
 }

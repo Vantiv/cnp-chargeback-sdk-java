@@ -11,6 +11,8 @@ repositories {
 }
 
 configurations {
+    functionalTestCompile.extendsFrom testCompile
+    functionalTestRuntime.extendsFrom testRuntime
     generateJAXB.extendsFrom mainRuntime
 }
 
@@ -18,6 +20,12 @@ sourceSets {
     main{
         java{
             srcDirs += "$buildDir/generated"
+        }
+    }
+    functionalTest {
+        java {
+            compileClasspath += main.output
+            runtimeClasspath += main.output
         }
     }
 }
@@ -32,6 +40,19 @@ dependencies {
     generateJAXB group:'com.sun.xml.bind', name:'jaxb-impl', version:'2.2.5-5'
     generateJAXB group:'com.sun.xml.bind', name:'jaxb-xjc', version:'2.2.5'
 }
+
+
+clean {
+    // temporary, we need to change the tests to generate output inside build folder
+    delete 'test'
+}
+
+
+test {
+    reports.junitXml.destination = "$buildDir/test-results/unit"
+    reports.html.destination = "$buildDir/reports/tests/unit"
+}
+
 
 task generateJaxbClasses() {
     compileJava.dependsOn it
@@ -52,4 +73,13 @@ task generateJaxbClasses() {
             schema(dir:"src/main/xsd/", includes:"chargeback-api-v2.1.xsd,litleChargebackWebService_v1.0.xsd")
         }
     }
+}
+
+task testFunctional(type:Test, dependsOn: functionalTestClasses){
+    check.dependsOn it
+    classpath = project.sourceSets.functionalTest.runtimeClasspath
+    mustRunAfter test
+    testClassesDir = file(project.sourceSets.functionalTest.output.classesDir)
+    reports.junitXml.destination = "$buildDir/test-results/functional"
+    reports.html.destination = "$buildDir/reports/tests/functional"
 }
