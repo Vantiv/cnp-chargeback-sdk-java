@@ -1,5 +1,7 @@
 package com.cnp.sdk;
 
+import com.cnp.sdk.generate.ChargebackDocumentUploadResponse;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -44,13 +46,10 @@ public class ChargebackDocument {
 
     //TODO: decide if you want to accept File object or path
 
-    public String uploadDocument(String caseId, File document){
-        //TODO: fix suffix and test
-        String mid = config.getProperty("merchantId");
-//        String urlSuffix = "chargebacks/documents/" + mid + "/" + caseId + "/" + document.getName();
+    public ChargebackDocumentUploadResponse uploadDocument(String caseId, File document){
         String urlSuffix = "chargebacks/upload/" + caseId + "/" + document.getName();
         String xml = communication.postDocumentRequest(document, urlSuffix, config);
-        return xml;
+        return XMLConverter.generateDocumentResponse(xml);
     }
 
     public File retrieveDocument(String caseId, String documentId){
@@ -59,17 +58,17 @@ public class ChargebackDocument {
         return file;
     }
 
-    public String replaceDocument(String caseId, File document){
-        String mid = config.getProperty("merchantId");
+    public ChargebackDocumentUploadResponse replaceDocument(String caseId, File document){
         String urlSuffix = "chargebacks/replace/" + caseId + "/" + document.getName();
         String xml = communication.putDocumentRequest(document, urlSuffix, config);
-        return xml;
+        return XMLConverter.generateDocumentResponse(xml);
     }
 
-    public String deleteDocument(String caseId, String documentId){
+    public ChargebackDocumentUploadResponse deleteDocument(String caseId, String documentId){
         String urlSuffix = "chargebacks/remove/" + caseId + "/" + documentId;
         String xml = communication.deleteDocumentRequest(config, urlSuffix);
-        return xml;
+        System.out.println(xml);
+        return XMLConverter.generateDocumentResponse(xml);
     }
 
     public static void main(String[] args) {
@@ -77,8 +76,8 @@ public class ChargebackDocument {
 //        System.out.println(r.retrieveDocument("216004901502", "test_note.pdf"));
         File file = new File("document_test.PNG");
 //        System.out.println(r.uploadDocument("216002100701", file));
-        System.out.println(r.retrieveDocument("216002100701", "document_test.PNG"));
+//        System.out.println(r.retrieveDocument("216002100701", "document_test.PNG"));
 //        System.out.println(r.replaceDocument("216002100701", file));
-//        System.out.println(r.deleteDocument("216002100701", "document_test.PNG"));
+        System.out.println(r.deleteDocument("216002100701", "Capture.PNG"));
     }
 }

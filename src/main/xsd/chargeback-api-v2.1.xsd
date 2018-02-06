@@ -1,121 +1,134 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema elementFormDefault="qualified" version="1.0" targetNamespace="http://www.vantivcnp.com/chargebacks" xmlns:tns="http://www.vantivcnp.com/chargebacks" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xs:element name="chargebackRetrievalResponse" type="tns:chargebackRetrievalResponse"/>
+  <xs:element name="chargebackRetrievalResponse" type="tns:chargebackRetrievalResponse"/>
 
-    <xs:element name="chargebackUpdateRequest" type="tns:chargebackUpdateRequest"/>
+  <xs:element name="chargebackUpdateRequest" type="tns:chargebackUpdateRequest"/>
 
-    <xs:element name="chargebackUpdateResponse" type="tns:chargebackUpdateResponse"/>
+  <xs:element name="chargebackUpdateResponse" type="tns:chargebackUpdateResponse"/>
 
-    <xs:element name="errorResponse" type="tns:errorResponse"/>
+  <xs:element name="errorResponse" type="tns:errorResponse"/>
 
-    <xs:complexType name="chargebackApiActivity">
-        <xs:sequence>
-            <xs:element name="activityDate" type="xs:date" minOccurs="0"/>
-            <xs:element name="activityType" type="xs:string" minOccurs="0"/>
-            <xs:element name="fromQueue" type="xs:string" minOccurs="0"/>
-            <xs:element name="toQueue" type="xs:string" minOccurs="0"/>
-            <xs:element name="settlementAmount" type="xs:long" minOccurs="0"/>
-            <xs:element name="settlementCurrencyType" type="xs:string" minOccurs="0"/>
-            <xs:element name="notes" type="xs:string" minOccurs="0"/>
-            <xs:element name="assignedTo" type="xs:string" minOccurs="0"/>
-        </xs:sequence>
-    </xs:complexType>
+  <xs:element name="chargebackDocumentUploadResponse" type="tns:chargebackDocumentUploadResponse"/>
 
-    <xs:complexType name="chargebackApiCase">
-        <xs:sequence>
-            <xs:element name="caseId" type="xs:long" minOccurs="0"/>
-            <xs:element name="merchantId" type="xs:long" minOccurs="0"/>
-            <xs:element name="dayIssuedByBank" type="xs:date" minOccurs="0"/>
-            <xs:element name="dateReceivedByVantivCnp" type="xs:date" minOccurs="0"/>
-            <xs:element name="vantivCnpTxnId" type="xs:long" minOccurs="0"/>
-            <xs:element name="cycle" type="xs:string" minOccurs="0"/>
-            <xs:element name="orderId" type="xs:string" minOccurs="0"/>
-            <xs:element name="cardNumberLast4" type="xs:string" minOccurs="0"/>
-            <xs:element name="cardType" type="xs:string" minOccurs="0"/>
-            <xs:element name="chargebackAmount" type="xs:long" minOccurs="0"/>
-            <xs:element name="chargebackCurrencyType" type="xs:string" minOccurs="0"/>
-            <xs:element name="originalTxnDay" type="xs:date" minOccurs="0"/>
-            <xs:element name="chargebackType" type="xs:string" minOccurs="0"/>
-            <xs:element name="representedAmount" type="xs:long" minOccurs="0"/>
-            <xs:element name="representedCurrencyType" type="xs:string" minOccurs="0"/>
-            <xs:element name="reasonCode" type="xs:string" minOccurs="0"/>
-            <xs:element name="reasonCodeDescription" type="xs:string" minOccurs="0"/>
-            <xs:element name="currentQueue" type="xs:string" minOccurs="0"/>
-            <xs:element name="fraudNotificationStatus" type="xs:string" minOccurs="0"/>
-            <xs:element name="acquirerReferenceNumber" type="xs:string" minOccurs="0"/>
-            <xs:element name="chargebackReferenceNumber" type="xs:string" minOccurs="0"/>
-            <xs:element name="preArbitrationAmount" type="xs:long" minOccurs="0"/>
-            <xs:element name="preArbitrationCurrencyType" type="xs:string" minOccurs="0"/>
-            <xs:element name="merchantTxnId" type="xs:string" minOccurs="0"/>
-            <xs:element name="fraudNotificationDate" type="xs:string" minOccurs="0"/>
-            <xs:element name="bin" type="xs:string" minOccurs="0"/>
-            <xs:element name="token" type="xs:string" minOccurs="0"/>
-            <xs:element name="historicalWinPercentage" type="xs:long" minOccurs="0"/>
-            <xs:element name="customerId" type="xs:string" minOccurs="0"/>
-            <xs:element name="paymentAmount" type="xs:long" minOccurs="0"/>
-            <xs:element name="paymentSecondaryAmount" type="xs:long" minOccurs="0"/>
-            <xs:element name="replyByDay" type="xs:date" minOccurs="0"/>
-            <xs:element name="activity" type="tns:chargebackApiActivity" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
+  <xs:complexType name="chargebackApiActivity">
+    <xs:sequence>
+      <xs:element name="activityDate" type="xs:date" minOccurs="0"/>
+      <xs:element name="activityType" type="xs:string" minOccurs="0"/>
+      <xs:element name="fromQueue" type="xs:string" minOccurs="0"/>
+      <xs:element name="toQueue" type="xs:string" minOccurs="0"/>
+      <xs:element name="settlementAmount" type="xs:long" minOccurs="0"/>
+      <xs:element name="settlementCurrencyType" type="xs:string" minOccurs="0"/>
+      <xs:element name="notes" type="xs:string" minOccurs="0"/>
+      <xs:element name="assignedTo" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
 
-    <xs:complexType name="chargebackRetrievalResponse">
-        <xs:sequence>
-            <xs:element name="transactionId" type="xs:long" minOccurs="0"/>
-            <xs:element name="chargebackCase" type="tns:chargebackApiCase" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
+  <xs:complexType name="chargebackApiCase">
+    <xs:sequence>
+      <xs:element name="caseId" type="xs:long" minOccurs="0"/>
+      <xs:element name="merchantId" type="xs:long" minOccurs="0"/>
+      <xs:element name="dayIssuedByBank" type="xs:date" minOccurs="0"/>
+      <xs:element name="dateReceivedByVantivCnp" type="xs:date" minOccurs="0"/>
+      <xs:element name="vantivCnpTxnId" type="xs:long" minOccurs="0"/>
+      <xs:element name="cycle" type="xs:string" minOccurs="0"/>
+      <xs:element name="orderId" type="xs:string" minOccurs="0"/>
+      <xs:element name="cardNumberLast4" type="xs:string" minOccurs="0"/>
+      <xs:element name="cardType" type="xs:string" minOccurs="0"/>
+      <xs:element name="chargebackAmount" type="xs:long" minOccurs="0"/>
+      <xs:element name="chargebackCurrencyType" type="xs:string" minOccurs="0"/>
+      <xs:element name="originalTxnDay" type="xs:date" minOccurs="0"/>
+      <xs:element name="chargebackType" type="xs:string" minOccurs="0"/>
+      <xs:element name="representedAmount" type="xs:long" minOccurs="0"/>
+      <xs:element name="representedCurrencyType" type="xs:string" minOccurs="0"/>
+      <xs:element name="reasonCode" type="xs:string" minOccurs="0"/>
+      <xs:element name="reasonCodeDescription" type="xs:string" minOccurs="0"/>
+      <xs:element name="currentQueue" type="xs:string" minOccurs="0"/>
+      <xs:element name="fraudNotificationStatus" type="xs:string" minOccurs="0"/>
+      <xs:element name="acquirerReferenceNumber" type="xs:string" minOccurs="0"/>
+      <xs:element name="chargebackReferenceNumber" type="xs:string" minOccurs="0"/>
+      <xs:element name="preArbitrationAmount" type="xs:long" minOccurs="0"/>
+      <xs:element name="preArbitrationCurrencyType" type="xs:string" minOccurs="0"/>
+      <xs:element name="merchantTxnId" type="xs:string" minOccurs="0"/>
+      <xs:element name="fraudNotificationDate" type="xs:string" minOccurs="0"/>
+      <xs:element name="bin" type="xs:string" minOccurs="0"/>
+      <xs:element name="token" type="xs:string" minOccurs="0"/>
+      <xs:element name="historicalWinPercentage" type="xs:long" minOccurs="0"/>
+      <xs:element name="customerId" type="xs:string" minOccurs="0"/>
+      <xs:element name="paymentAmount" type="xs:long" minOccurs="0"/>
+      <xs:element name="paymentSecondaryAmount" type="xs:long" minOccurs="0"/>
+      <xs:element name="replyByDay" type="xs:date" minOccurs="0"/>
+      <xs:element name="activity" type="tns:chargebackApiActivity" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
 
-    <xs:complexType name="chargebackUpdateRequest">
-        <xs:sequence>
-            <xs:element name="activityType" type="tns:activityType"/>
-            <xs:element name="assignedTo" minOccurs="0">
-                <xs:simpleType>
-                    <xs:restriction base="xs:string">
-                        <xs:maxLength value="25"/>
-                        <xs:minLength value="1"/>
-                    </xs:restriction>
-                </xs:simpleType>
-            </xs:element>
-            <xs:element name="note" minOccurs="0">
-                <xs:simpleType>
-                    <xs:restriction base="xs:string">
-                        <xs:maxLength value="4000"/>
-                        <xs:minLength value="1"/>
-                    </xs:restriction>
-                </xs:simpleType>
-            </xs:element>
-            <xs:element name="representedAmount" type="xs:long" minOccurs="0"/>
-        </xs:sequence>
-    </xs:complexType>
+  <xs:complexType name="chargebackRetrievalResponse">
+    <xs:sequence>
+      <xs:element name="transactionId" type="xs:long" minOccurs="0"/>
+      <xs:element name="chargebackCase" type="tns:chargebackApiCase" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
 
-    <xs:complexType name="chargebackUpdateResponse">
-        <xs:sequence>
-            <xs:element name="transactionId" type="xs:long" minOccurs="0"/>
-        </xs:sequence>
-    </xs:complexType>
+  <xs:complexType name="chargebackUpdateRequest">
+    <xs:sequence>
+      <xs:element name="activityType" type="tns:activityType"/>
+      <xs:element name="assignedTo" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="25"/>
+            <xs:minLength value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="note" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="4000"/>
+            <xs:minLength value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="representedAmount" type="xs:long" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
 
-    <xs:complexType name="errorResponse">
-        <xs:sequence>
-            <xs:element name="errors" minOccurs="0">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element name="error" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-        </xs:sequence>
-    </xs:complexType>
+  <xs:complexType name="chargebackUpdateResponse">
+    <xs:sequence>
+      <xs:element name="transactionId" type="xs:long" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
 
-    <xs:simpleType name="activityType">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="ASSIGN_TO_USER"/>
-            <xs:enumeration value="ADD_NOTE"/>
-            <xs:enumeration value="MERCHANT_ACCEPTS_LIABILITY"/>
-            <xs:enumeration value="MERCHANT_REPRESENT"/>
-            <xs:enumeration value="MERCHANT_RESPOND"/>
-            <xs:enumeration value="MERCHANT_REQUESTS_ARBITRATION"/>
-        </xs:restriction>
-    </xs:simpleType>
+  <xs:complexType name="errorResponse">
+    <xs:sequence>
+      <xs:element name="errors" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="error" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="activityType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ASSIGN_TO_USER"/>
+      <xs:enumeration value="ADD_NOTE"/>
+      <xs:enumeration value="MERCHANT_ACCEPTS_LIABILITY"/>
+      <xs:enumeration value="MERCHANT_REPRESENT"/>
+      <xs:enumeration value="MERCHANT_RESPOND"/>
+      <xs:enumeration value="MERCHANT_REQUESTS_ARBITRATION"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="chargebackDocumentUploadResponse">
+    <xs:sequence>
+      <xs:element name="merchantId" type="xs:long" />
+      <xs:element name="caseId" type="xs:long" />
+      <xs:element name="documentId" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="responseCode" type="xs:string" />
+      <xs:element name="responseMessage" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
 </xs:schema>
+

@@ -70,16 +70,16 @@ task generateJaxbClasses() {
     doLast {
         ant.taskdef(name: "xjc", classname:"com.sun.tools.xjc.XJCTask", classpath:configurations.generateJAXB.asPath)
         ant.xjc(destdir:"${generatedDir}", package: "com.cnp.sdk.generate", binding:bindingsFile, extension:'true'){
-            schema(dir:"src/main/xsd/", includes:"chargeback-api-v2.1.xsd,litleChargebackWebService_v1.0.xsd")
+            schema(dir:"src/main/xsd/", includes:"chargeback-api-v2.1.xsd")
         }
     }
 }
 
-task testFunctional(type:Test, dependsOn: functionalTestClasses){
-    check.dependsOn it
-    classpath = project.sourceSets.functionalTest.runtimeClasspath
-    mustRunAfter test
-    testClassesDir = file(project.sourceSets.functionalTest.output.classesDir)
-    reports.junitXml.destination = "$buildDir/test-results/functional"
-    reports.html.destination = "$buildDir/reports/tests/functional"
-}
+//task testFunctional(type:Test, dependsOn: functionalTestClasses){
+//    check.dependsOn it
+//    classpath = project.sourceSets.functionalTest.runtimeClasspath
+//    mustRunAfter test
+//    testClassesDir = file(project.sourceSets.functionalTest.output.classesDir)
+//    reports.junitXml.destination = "$buildDir/test-results/functional"
+//    reports.html.destination = "$buildDir/reports/tests/functional"
+//}
