@@ -1,20 +1,30 @@
 package com.cnp.sdk;
 
-import com.cnp.sdk.generate.ActivityType;
-import com.cnp.sdk.generate.ChargebackRetrievalResponse;
-import com.cnp.sdk.generate.ChargebackUpdateRequest;
-import com.cnp.sdk.generate.ChargebackUpdateResponse;
+import com.cnp.sdk.generate.*;
 
 import javax.xml.bind.JAXBException;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
+import java.util.List;
 import java.util.Properties;
+
+/**
+ * Chargeback object has methods for performing the different Chargeback functionalities supported by the Vantiv API
+ * These functionalities include retrieving chargeback cases based on various filters, updating chargeback cases and
+ * managing supporting documents for the chargeback cases.
+ *
+ * @author harshitvora
+ *
+ */
 
 public class Chargeback {
 
     private Properties config;
     private Communication communication;
+    private final String URL_PATH = "/services/chargebacks/";
 
     public Chargeback() {
 
@@ -54,14 +64,12 @@ public class Chargeback {
      *	username
      *	merchantId
      *	password
-     *	version (eg 8.10)
      *	timeout (in seconds)
      *	Optional properties are:
      *	proxyHost
      *	proxyPort
      *	printxml (possible values "true" and "false" - defaults to false)
-     * TODO: comments
-     * @param config
+     *  neuterxml (possible values "true" and "false" - defaults to false)
      */
     public Chargeback(Properties config) {
         this.config = config;
@@ -70,19 +78,19 @@ public class Chargeback {
     ////////////////////////////////////////////////////////////////////
 
     private ChargebackRetrievalResponse getRetrievalReposnse(String key, String value){
-        String urlSuffix = "chargebacks/?" + key + "=" + value;
+        String urlSuffix = URL_PATH + "?" + key + "=" + value;
         String response = sendRetrievalRequest(urlSuffix);
         return XMLConverter.generateRetrievalResponse(response);
     }
 
     private ChargebackRetrievalResponse getRetrievalReposnse(String key1, String value1, String key2, String value2){
-        String urlSuffix = "chargebacks/?" + key1 + "=" + value1 + "&" + key2 + "=" + value2;
+        String urlSuffix = URL_PATH + "?" + key1 + "=" + value1 + "&" + key2 + "=" + value2;
         String response = sendRetrievalRequest(urlSuffix);
         return XMLConverter.generateRetrievalResponse(response);
     }
 
     private ChargebackRetrievalResponse getRetrievalReposnse(String caseId){
-        String urlSuffix = "chargebacks/" + caseId;
+        String urlSuffix = URL_PATH + caseId;
         String response = sendRetrievalRequest(urlSuffix);
         return XMLConverter.generateRetrievalResponse(response);
     }
@@ -124,7 +132,7 @@ public class Chargeback {
     //////////////////////////////////////////////////////////////
 
     private String sendUpdateRequest(String caseId, String xmlRequest){
-        String urlSuffix = "chargebacks/" + caseId;
+        String urlSuffix = URL_PATH + caseId;
         String xml = communication.putRequest(config, urlSuffix, xmlRequest);
         return xml;
     }
@@ -157,8 +165,6 @@ public class Chargeback {
         return getUpdateResponse(caseId, request);
     }
 
-    //TODO: figure out data type for representedAmount
-
     public ChargebackUpdateResponse representCase(String caseId, Long representedAmount, String note){
         ChargebackUpdateRequest request = new ChargebackUpdateRequest();
         request.setActivityType(ActivityType.MERCHANT_REPRESENT);
@@ -174,13 +180,53 @@ public class Chargeback {
         return getUpdateResponse(caseId, request);
     }
 
+    //////////////////////////////////////////////////////////////
+
+    //TODO: decide if you want to accept File object or path
+
+    public ChargebackDocumentUploadResponse uploadDocument(String caseId, File document){
+        String urlSuffix = URL_PATH + "upload/" + caseId + "/" + document.getName();
+        String xml = communication.postDocumentRequest(document, urlSuffix, config);
+        return XMLConverter.generateDocumentResponse(xml);
+    }
+
+    public File retrieveDocument(String caseId, String documentId){
+        String urlSuffix = URL_PATH + "retrieve/" + caseId + "/" + documentId;
+        File file = communication.getDocumentRequest(documentId, config, urlSuffix);
+        return file;
+    }
+
+    public ChargebackDocumentUploadResponse replaceDocument(String caseId, File document){
+        String urlSuffix = URL_PATH + "replace/" + caseId + "/" + document.getName();
+        String xml = communication.putDocumentRequest(document, urlSuffix, config);
+        return XMLConverter.generateDocumentResponse(xml);
+    }
+
+    public ChargebackDocumentUploadResponse deleteDocument(String caseId, String documentId){
+        String urlSuffix = URL_PATH + "remove/" + caseId + "/" + documentId;
+        String xml = communication.deleteDocumentRequest(config, urlSuffix);
+        return XMLConverter.generateDocumentResponse(xml);
+    }
+
+    public ChargebackDocumentUploadResponse listDocuments(String caseId){
+        String urlSuffix = URL_PATH + "list/" + caseId;
+        String xml = communication.getRequest(config, urlSuffix);
+        return XMLConverter.generateDocumentResponse(xml);
+    }
+
     public static void main(String[] args) throws JAXBException {
-//        Chargeback r = new Chargeback();
-//        ChargebackRetrievalResponse re = r.getChargebacksByDate("2018-01-31");
-//        System.out.println(re.getChargebackCases().get(0).getActivities().get(0).getNotes());
-
-
         Chargeback r = new Chargeback();
-        System.out.println(r.addNoteToCase("216002100701", "Test note"));
+        ChargebackRetrievalResponse re = r.getActivityByCaseId("216002100701");
+        System.out.println(re.getChargebackCases().get(0).getCaseId());
+
+//        Chargeback r = new Chargeback();
+//        System.out.println(r.addNoteToCase("216002100701", "Test note"));
+//        List<ChargebackApiActivity> alist = r.getActivityByCaseId("216002100701").getChargebackCases().get(0).getActivities();
+//        for (ChargebackApiActivity a :
+//                alist) {
+//            System.out.println(a.getActivityType());
+//            System.out.println(a.getNotes());
+//        }
+//        System.out.println(r.representCase("216002100701", 1L,"test"));
     }
 }
