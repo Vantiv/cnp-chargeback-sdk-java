@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.net.ssl.SSLContext;
 
 import org.apache.http.HttpEntity;
@@ -41,6 +42,13 @@ public class Communication {
     private static final String NEUTER_STR = "NEUTERED";
     private CloseableHttpClient httpClient;
     private final int KEEP_ALIVE_DURATION = 8000;
+    private final String AUTHORIZATION_HEADER = "Authorization";
+    private final String CONTENT_TYPE_HEADER = "Content-Type";
+    private final String CONTENT_LENGTH_HEADER = "Content-Length";
+    private final String ACCEPT_HEADER = "Accept";
+    private final String CONNECTION_HEADER = "Connection";
+    private final String CONNECTION_CLOSE = "close";
+    private final String CONTENT_TYPE_CNP = "application/com.vantivcnp.services-v2+xml";
 
     public Communication() {
         try {
@@ -92,21 +100,19 @@ public class Communication {
         return bestProtocol;
     }
 
-    //TODO: fix headers
-
-    public File getDocumentRequest(String documentId, Properties configuration, String urlSuffix) {
+    public String getDocumentRequest(String filepath, Properties configuration, String urlSuffix) {
+        String xmlResponse;
         File document = null;
         boolean httpKeepAlive = Boolean.valueOf(configuration.getProperty("httpKeepAlive", "true"));
         RequestConfig requestConfig = generateRequestConfig(configuration);
 
         String requestUrl = configuration.getProperty("url") + urlSuffix;
         HttpGet get = new HttpGet(requestUrl);
-        String username = configuration.getProperty("username");
-        String password = configuration.getProperty("password");
-        String authCode = new String(Base64.encodeBase64((username + ":" + password).getBytes()));
-        get.setHeader("Authorization", "Basic " + authCode);
+        String authCode = generateAuthcode(configuration);
+
+        get.setHeader(AUTHORIZATION_HEADER, authCode);
         if(!httpKeepAlive) {
-            get.setHeader("Connection", "close");
+            get.setHeader(CONNECTION_HEADER, CONNECTION_CLOSE);
         }
 
         get.setConfig(requestConfig);
@@ -115,11 +121,9 @@ public class Communication {
         try {
             HttpResponse response = httpClient.execute(get);
             entity = response.getEntity();
-            if (response.getStatusLine().getStatusCode() != 200) {
-                throw new ChargebackException(response.getStatusLine().getStatusCode() + ":" +
-                        response.getStatusLine().getReasonPhrase());
-            }
-            document = new File(documentId);
+            xmlResponse = validateResponse(response);
+            printToConsole(null, xmlResponse, configuration);
+            document = new File(filepath);
             entity.writeTo(new FileOutputStream(document));
         } catch (IOException e) {
             throw new ChargebackException("Exception connection to Vantiv", e);
@@ -129,7 +133,7 @@ public class Communication {
             }
             get.abort();
         }
-        return document;
+        return xmlResponse;
     }
 
     public String postDocumentRequest(File file, String urlSuffix, Properties configuration) {
@@ -137,23 +141,21 @@ public class Communication {
         boolean httpKeepAlive = Boolean.valueOf(configuration.getProperty("httpKeepAlive", "false"));
         RequestConfig requestConfig = generateRequestConfig(configuration);
         String requestUrl = configuration.getProperty("url") + urlSuffix;
-        System.out.println(requestUrl);
         HttpPost post = new HttpPost(requestUrl);
-        String username = configuration.getProperty("username");
-        String password = configuration.getProperty("password");
-        String authCode = new String(Base64.encodeBase64((username + ":" + password).getBytes()));
-        post.setHeader("Authorization", "Basic " + authCode);
-        post.setHeader("Content-Type", "image/png");
-//        post.setHeader("Content-Length", new String(file.getTotalSpace()));
+        String authCode = generateAuthcode(configuration);
+
+        post.setHeader(AUTHORIZATION_HEADER, authCode);
+        post.setHeader(CONTENT_TYPE_HEADER, getFileContentType(file));
+        post.setHeader(CONTENT_LENGTH_HEADER, getFileLength(file));
         if(!httpKeepAlive) {
-            post.setHeader("Connection", "close");
+            post.setHeader(CONNECTION_HEADER, CONNECTION_CLOSE);
         }
 
         post.setConfig(requestConfig);
         try {
             post.setEntity(new FileEntity(file));
             HttpResponse response = httpClient.execute(post);
-            xmlResponse = validateDocumentResponse(response);
+            xmlResponse = validateResponse(response);
             printToConsole(null, xmlResponse, configuration);
         } catch (IOException e) {
             throw new ChargebackException("Exception connection to Litle", e);
@@ -169,21 +171,20 @@ public class Communication {
         RequestConfig requestConfig = generateRequestConfig(configuration);
         String requestUrl = configuration.getProperty("url") + urlSuffix;
         HttpPut put = new HttpPut(requestUrl);
-        String username = configuration.getProperty("username");
-        String password = configuration.getProperty("password");
-        String authCode = new String(Base64.encodeBase64((username + ":" + password).getBytes()));
-        put.setHeader("Authorization", "Basic " + authCode);
-        put.setHeader("Content-Type", "image");
-//        post.setHeader("Content-Length", "application/com.vantivcnp.services-v2+xml");
+        String authCode = generateAuthcode(configuration);
+
+        put.setHeader(AUTHORIZATION_HEADER, authCode);
+        put.setHeader(CONTENT_TYPE_HEADER, getFileContentType(file));
+        put.setHeader(CONTENT_LENGTH_HEADER, getFileLength(file));
         if(!httpKeepAlive) {
-            put.setHeader("Connection", "close");
+            put.setHeader(CONNECTION_HEADER, CONNECTION_CLOSE);
         }
 
         put.setConfig(requestConfig);
         try {
             put.setEntity(new FileEntity(file));
             HttpResponse response = httpClient.execute(put);
-            xmlResponse = validateDocumentResponse(response);
+            xmlResponse = validateResponse(response);
             printToConsole(null, xmlResponse, configuration);
         } catch (IOException e) {
             throw new ChargebackException("Exception connection to Vantiv", e);
@@ -201,11 +202,9 @@ public class Communication {
 
         String requestUrl = configuration.getProperty("url") + urlSuffix;
         HttpDelete delete = new HttpDelete(requestUrl);
-        String username = configuration.getProperty("username");
-        String password = configuration.getProperty("password");
-        String authCode = new String(Base64.encodeBase64((username + ":" + password).getBytes()));
-        delete.setHeader("Authorization", "Basic " + authCode);
-        delete.setHeader("Content-Type", "image");
+        String authCode = generateAuthcode(configuration);
+
+        delete.setHeader("Authorization", authCode);
         if(!httpKeepAlive) {
             delete.setHeader("Connection", "close");
         }
@@ -214,7 +213,7 @@ public class Communication {
 
         try {
             HttpResponse response = httpClient.execute(delete);
-            xmlResponse = validateDocumentResponse(response);
+            xmlResponse = validateResponse(response);
             printToConsole(null, xmlResponse, configuration);
         } catch (IOException e) {
             throw new ChargebackException("Exception connection to Vantiv", e);
@@ -224,6 +223,86 @@ public class Communication {
         return xmlResponse;
     }
 
+    public String getRequest(Properties configuration, String urlSuffix) {
+        String xmlResponse;
+
+        boolean httpKeepAlive = Boolean.valueOf(configuration.getProperty("httpKeepAlive", "false"));
+        RequestConfig requestConfig = generateRequestConfig(configuration);
+
+        String requestUrl = configuration.getProperty("url") + urlSuffix;
+        HttpGet get = new HttpGet(requestUrl);
+
+        String authCode = generateAuthcode(configuration);
+        get.setHeader(AUTHORIZATION_HEADER, authCode);
+        get.setHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_CNP);
+        get.setHeader(ACCEPT_HEADER, CONTENT_TYPE_CNP);
+        if(!httpKeepAlive) {
+            get.setHeader(CONNECTION_HEADER, CONNECTION_CLOSE);
+        }
+
+        get.setConfig(requestConfig);
+
+        try {
+            HttpResponse response = httpClient.execute(get);
+            xmlResponse = validateResponse(response);
+            printToConsole(null, xmlResponse, configuration);
+        } catch (IOException e) {
+            throw new ChargebackException("Exception connection to Vantiv", e);
+        } finally {
+            get.abort();
+        }
+        return xmlResponse;
+    }
+
+    public String putRequest(Properties configuration, String urlSuffix, String xmlRequest) {
+        String xmlResponse;
+
+        boolean httpKeepAlive = Boolean.valueOf(configuration.getProperty("httpKeepAlive", "false"));
+        RequestConfig requestConfig = generateRequestConfig(configuration);
+
+        String requestUrl = configuration.getProperty("url") + urlSuffix;
+        HttpPut put = new HttpPut(requestUrl);
+
+        String authCode = generateAuthcode(configuration);
+        put.setHeader(AUTHORIZATION_HEADER, authCode);
+        put.setHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_CNP);
+        put.setHeader(ACCEPT_HEADER, CONTENT_TYPE_CNP);
+        if(!httpKeepAlive) {
+            put.setHeader(CONNECTION_HEADER, CONNECTION_CLOSE);
+        }
+
+        put.setConfig(requestConfig);
+        try {
+            put.setEntity(new StringEntity(xmlRequest,"UTF-8"));
+            HttpResponse response = httpClient.execute(put);
+            xmlResponse = validateResponse(response);
+            printToConsole(xmlRequest, xmlResponse, configuration);
+        } catch (IOException e) {
+            throw new ChargebackException("Exception connection to Vantiv", e);
+        } finally {
+            put.abort();
+        }
+        return xmlResponse;
+    }
+
+    /* Generate base64 encoded code for authentication */
+    private String generateAuthcode(Properties configuration){
+        String username = configuration.getProperty("username");
+        String password = configuration.getProperty("password");
+
+        return "Basic " + new String(Base64.encodeBase64((username + ":" + password).getBytes()));
+    }
+
+    /* Get content-type for input file */
+    private String getFileContentType(File file){
+        return new MimetypesFileTypeMap().getContentType(file);
+    }
+
+    private String getFileLength(File file){
+        return String.valueOf(file.length());
+    }
+
+    /* Method to generate RequestConfig object for HttpRequests */
     private RequestConfig generateRequestConfig(Properties configuration){
         String proxyHost = configuration.getProperty("proxyHost");
         String proxyPort = configuration.getProperty("proxyPort");
@@ -246,6 +325,7 @@ public class Communication {
         return requestConfig;
     }
 
+    /* Method to check Http response code is a Success response */
     private String validateResponse(HttpResponse response){
         HttpEntity entity = null;
         String xmlResponse;
@@ -269,29 +349,7 @@ public class Communication {
         return xmlResponse;
     }
 
-    private String validateDocumentResponse(HttpResponse response){
-        HttpEntity entity = null;
-        String xmlResponse;
-        try{
-            entity = response.getEntity();
-            if (response.getStatusLine().getStatusCode() != 200) {
-                System.out.println(EntityUtils.toString(entity,"UTF-8"));
-                throw new ChargebackException(response.getStatusLine().getStatusCode() + ":" +
-                        response.getStatusLine().getReasonPhrase());
-            }
-            xmlResponse = EntityUtils.toString(entity,"UTF-8");
-        }
-        catch (IOException e) {
-            throw new ChargebackException("Exception connection to Vantiv", e);
-        }
-        finally {
-            if (entity != null) {
-                EntityUtils.consumeQuietly(entity);
-            }
-        }
-        return xmlResponse;
-    }
-
+    /* Method to print request & response to console */
     private void printToConsole(String xmlRequest, String xmlResponse, Properties configuration){
         boolean printxml = "true".equalsIgnoreCase(configuration.getProperty("printxml"));
         boolean neuterXml = "true".equalsIgnoreCase(configuration.getProperty("neuterXml"));
@@ -308,71 +366,6 @@ public class Communication {
             }
             System.out.println("Response XML: " + xmlResponse);
         }
-    }
-
-    public String getRequest(Properties configuration, String urlSuffix) {
-        String xmlResponse;
-
-        boolean httpKeepAlive = Boolean.valueOf(configuration.getProperty("httpKeepAlive", "false"));
-        RequestConfig requestConfig = generateRequestConfig(configuration);
-
-        String requestUrl = configuration.getProperty("url") + urlSuffix;
-        HttpGet get = new HttpGet(requestUrl);
-        String username = configuration.getProperty("username");
-        String password = configuration.getProperty("password");
-        String authCode = new String(Base64.encodeBase64((username + ":" + password).getBytes()));
-        get.setHeader("Authorization", "Basic " + authCode);
-        get.setHeader("Content-Type", "application/com.vantivcnp.services-v2+xml");
-        get.setHeader("Accept", "application/com.vantivcnp.services-v2+xml");
-        if(!httpKeepAlive) {
-            get.setHeader("Connection", "close");
-        }
-
-        get.setConfig(requestConfig);
-
-        try {
-            HttpResponse response = httpClient.execute(get);
-            xmlResponse = validateResponse(response);
-            printToConsole(null, xmlResponse, configuration);
-        } catch (IOException e) {
-            throw new ChargebackException("Exception connection to Vantiv", e);
-        } finally {
-            get.abort();
-        }
-        return xmlResponse;
-    }
-
-
-    public String putRequest(Properties configuration, String urlSuffix, String xmlRequest) {
-        String xmlResponse;
-
-        boolean httpKeepAlive = Boolean.valueOf(configuration.getProperty("httpKeepAlive", "false"));
-        RequestConfig requestConfig = generateRequestConfig(configuration);
-
-        String requestUrl = configuration.getProperty("url") + urlSuffix;
-        HttpPut put = new HttpPut(requestUrl);
-        String username = configuration.getProperty("username");
-        String password = configuration.getProperty("password");
-        String authCode = new String(Base64.encodeBase64((username + ":" + password).getBytes()));
-        put.setHeader("Authorization", "Basic " + authCode);
-        put.setHeader("Content-Type", "application/com.vantivcnp.services-v2+xml");
-        put.setHeader("Accept", "application/com.vantivcnp.services-v2+xml");
-        if(!httpKeepAlive) {
-            put.setHeader("Connection", "close");
-        }
-
-        put.setConfig(requestConfig);
-        try {
-            put.setEntity(new StringEntity(xmlRequest,"UTF-8"));
-            HttpResponse response = httpClient.execute(put);
-            xmlResponse = validateResponse(response);
-            printToConsole(xmlRequest, xmlResponse, configuration);
-        } catch (IOException e) {
-            throw new ChargebackException("Exception connection to Vantiv", e);
-        } finally {
-            put.abort();
-        }
-        return xmlResponse;
     }
 
     /* Method to neuter out sensitive information from xml */

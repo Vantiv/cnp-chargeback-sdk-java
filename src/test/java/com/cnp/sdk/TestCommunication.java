@@ -1,6 +1,5 @@
-package com.litle.sdk;
+package com.cnp.sdk;
 
-import com.cnp.sdk.Communication;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,7 +11,7 @@ public class TestCommunication {
 	private Communication communication;
 
 	@Before
-	public void setup() throws Exception {
+	public void setup() {
 		communication = new Communication();
 	}
 
