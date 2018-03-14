@@ -1,10 +1,12 @@
 group 'com.vantiv'
-version '1.0-SNAPSHOT'
+version JAR_VERSION
 
-apply plugin: 'java'
-apply plugin: 'idea'
+apply plugin : 'eclipse'
+apply plugin : 'java'
+apply plugin : 'jacoco'
+apply plugin : 'maven'
 
-sourceCompatibility = 1.8
+sourceCompatibility = 1.7
 
 repositories {
     mavenCentral()
@@ -47,6 +49,21 @@ clean {
     delete 'test'
 }
 
+jacocoTestReport {
+    executionData = fileTree(dir:"${buildDir}/jacoco/", include:"*.exec")
+}
+
+jar{
+    manifest {
+        attributes("Implementation-Title":"Chargeback SDK For Java 1.5 and greater", "Implementation-Version":"${JAR_VERSION}","Implementation-Vendor":"vantiv","Main-Class":"com.cnp.sdk.Setup")
+    }
+    destinationDir = file("${DIST_DIR_15}/lib")
+    archiveName = "cnp-sdk-for-java-${JAR_VERSION}.jar"
+}
+
+javadoc{
+    destinationDir = file("$buildDir/kit/java15/doc")
+}
 
 test {
     reports.junitXml.destination = "$buildDir/test-results/unit"
@@ -56,6 +73,7 @@ test {
 
 task generateJaxbClasses() {
     compileJava.dependsOn it
+    eclipseClasspath.dependsOn it
 
     ext.bindingsFile = "src/main/xsd/bindings.xml"
     ext.generatedDir = "${buildDir}/generated"
@@ -75,11 +93,81 @@ task generateJaxbClasses() {
     }
 }
 
-//task testFunctional(type:Test, dependsOn: functionalTestClasses){
-//    check.dependsOn it
-//    classpath = project.sourceSets.functionalTest.runtimeClasspath
-//    mustRunAfter test
-//    testClassesDir = file(project.sourceSets.functionalTest.output.classesDir)
-//    reports.junitXml.destination = "$buildDir/test-results/functional"
-//    reports.html.destination = "$buildDir/reports/tests/functional"
-//}
+task testFunctional(type:Test, dependsOn: functionalTestClasses){
+    check.dependsOn it
+    classpath = project.sourceSets.functionalTest.runtimeClasspath
+    mustRunAfter test
+    testClassesDir = file(project.sourceSets.functionalTest.output.classesDir)
+    reports.junitXml.destination = "$buildDir/test-results/functional"
+    reports.html.destination = "$buildDir/reports/tests/functional"
+}
+
+task copyJarToKit(type:Copy, dependsOn:[check,jar]){
+    from "${DIST_DIR_15}/lib/cnp-sdk-for-java-${JAR_VERSION}.jar"
+    from "LICENSE"
+    into KIT_DIR
+}
+
+task copyLibsToKit(type:Copy, dependsOn:check){
+    from configurations.compile.asFileTree.matching{
+        include '**/activation*'
+        include '**/jaxb-api*'
+        include '**/jaxb-impl*'
+        include '**/jsr173*'
+        include '**/commons-logging-1.1.1*'
+        include '**/commons-codec*'
+        include '**/fluent-hc*'
+        include '**/httpclient*'
+        include '**/httpcore*'
+        include '**/httpmime*'
+        include '**/jsch*'
+    }
+
+    into KIT_DEPENDENCIES_DIR
+}
+
+task tarKit(type:Tar, dependsOn:[copyJarToKit, copyLibsToKit]){
+    compression = Compression.GZIP
+    destinationDir = file("$buildDir/kit")
+    archiveName = "cnp-sdk-for-java-${JAR_VERSION}.tar.gz"
+    from "$buildDir/kit/java15"
+}
+
+task zipKit(type:Zip, dependsOn:[copyJarToKit, copyLibsToKit]){
+    destinationDir = file("$buildDir/kit")
+    archiveName = "cnp-sdk-for-java-${JAR_VERSION}.zip"
+    from "$buildDir/kit/java15"
+}
+
+task kit(dependsOn:[tarKit, zipKit]){
+    if (JavaVersion.current().isJava8Compatible()) {
+        allprojects {
+            tasks.withType(Javadoc) {
+                options.addStringOption('Xdoclint:none', '-quiet')
+            }
+        }
+    }
+    build.dependsOn it
+    dependsOn javadoc
+}
+
+task writeNewPom(type:Copy) {
+    build.dependsOn it
+    pom {
+        project {
+            modelVersion '4.0.0'
+            groupId 'com.cnp'
+            artifactId 'cnp-chargeback-sdk-java'
+            version "${JAR_VERSION}"
+        }
+    }.writeTo("$buildDir/kit/pom.xml")
+}
+
+task sourceJar(type:Jar) {
+    build.dependsOn it
+    dependsOn generateJaxbClasses
+    destinationDir = file("${buildDir}/kit")
+    classifier = 'sources'
+    from "src/main/java"
+    from generateJaxbClasses.generatedDir
+}
