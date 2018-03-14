@@ -67,6 +67,7 @@ public class ChargebackDocument {
      *  neuterxml (possible values "true" and "false" - defaults to false)
      */
     public ChargebackDocument(Properties config) {
+        communication = new Communication();
         this.config = config;
     }
 
@@ -80,10 +81,10 @@ public class ChargebackDocument {
         return XMLConverter.generateDocumentResponse(xml);
     }
 
-    public ChargebackDocumentUploadResponse retrieveDocument(Long caseId, String documentId, String filepath){
+    public File retrieveDocument(Long caseId, String documentId, String filepath){
         String urlSuffix = URL_PATH + "retrieve/" + caseId + "/" + documentId;
-        String xml = communication.getDocumentRequest(filepath, config, urlSuffix);
-        return XMLConverter.generateDocumentResponse(xml);
+        File document = communication.getDocumentRequest(filepath, config, urlSuffix);
+        return document;
     }
 
     public ChargebackDocumentUploadResponse replaceDocument(Long caseId, File document){

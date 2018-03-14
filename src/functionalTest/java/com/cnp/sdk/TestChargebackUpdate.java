@@ -7,38 +7,35 @@ import static junit.framework.Assert.assertNotNull;
 
 public class TestChargebackUpdate {
 
+    private ChargebackUpdate cbk = new ChargebackUpdate();
+
     @Test
     public void testChargebackAssignCaseToUser(){
-        ChargebackUpdate cbk = new ChargebackUpdate();
-        ChargebackUpdateResponse re = cbk.assignCaseToUser(123L, "test_user", "Test assigned to user");
-        assertNotNull(re.getTransactionId());
+        ChargebackUpdateResponse response = cbk.assignCaseToUser(123L, "test_user", "Test assigned to user");
+        assertNotNull(response.getTransactionId());
     }
 
     @Test
     public void testChargebackAddNoteToCase(){
-        ChargebackUpdate cbk = new ChargebackUpdate();
-        ChargebackUpdateResponse re = cbk.addNoteToCase(123L, "Test added note");
-        assertNotNull(re.getTransactionId());
+        ChargebackUpdateResponse response = cbk.addNoteToCase(123L, "Test added note");
+        assertNotNull(response.getTransactionId());
     }
 
     @Test
     public void testChargebackAssumeLiability(){
-        ChargebackUpdate cbk = new ChargebackUpdate();
-        ChargebackUpdateResponse re = cbk.assumeLiability(123L, "Test assumed liability");
-        assertNotNull(re.getTransactionId());
+        ChargebackUpdateResponse response = cbk.assumeLiability(123L, "Test assumed liability");
+        assertNotNull(response.getTransactionId());
     }
 
     @Test
     public void testChargebackRepresent(){
-        ChargebackUpdate cbk = new ChargebackUpdate();
-        ChargebackUpdateResponse re = cbk.representCase(123L, 20L, "Test represented");
-        assertNotNull(re.getTransactionId());
+        ChargebackUpdateResponse response = cbk.representCase(123L, 20L, "Test represented");
+        assertNotNull(response.getTransactionId());
     }
 
     @Test
     public void testChargebackRespondToUpdateRequest(){
-        ChargebackUpdate cbk = new ChargebackUpdate();
-        ChargebackUpdateResponse re = cbk.respondToRetrievalRequest(123L, "Test responded to Update request");
-        assertNotNull(re.getTransactionId());
+        ChargebackUpdateResponse response = cbk.respondToRetrievalRequest(123L, "Test responded to Update request");
+        assertNotNull(response.getTransactionId());
     }
 }

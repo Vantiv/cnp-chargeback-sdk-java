@@ -9,6 +9,8 @@ import java.util.Properties;
 import javax.activation.MimetypesFileTypeMap;
 import javax.net.ssl.SSLContext;
 
+import com.cnp.sdk.generate.ChargebackDocumentUploadResponse;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -44,7 +46,6 @@ public class Communication {
     private final int KEEP_ALIVE_DURATION = 8000;
     private final String AUTHORIZATION_HEADER = "Authorization";
     private final String CONTENT_TYPE_HEADER = "Content-Type";
-    private final String CONTENT_LENGTH_HEADER = "Content-Length";
     private final String ACCEPT_HEADER = "Accept";
     private final String CONNECTION_HEADER = "Connection";
     private final String CONNECTION_CLOSE = "close";
@@ -100,7 +101,7 @@ public class Communication {
         return bestProtocol;
     }
 
-    public String getDocumentRequest(String filepath, Properties configuration, String urlSuffix) {
+    public File getDocumentRequest(String filepath, Properties configuration, String urlSuffix) {
         String xmlResponse;
         File document = null;
         boolean httpKeepAlive = Boolean.valueOf(configuration.getProperty("httpKeepAlive", "true"));
@@ -120,11 +121,8 @@ public class Communication {
         HttpEntity entity = null;
         try {
             HttpResponse response = httpClient.execute(get);
-            entity = response.getEntity();
-            xmlResponse = validateResponse(response);
-            printToConsole(null, xmlResponse, configuration);
+            validateDocumentResponse(response, filepath);
             document = new File(filepath);
-            entity.writeTo(new FileOutputStream(document));
         } catch (IOException e) {
             throw new ChargebackException("Exception connection to Vantiv", e);
         } finally {
@@ -133,7 +131,7 @@ public class Communication {
             }
             get.abort();
         }
-        return xmlResponse;
+        return document;
     }
 
     public String postDocumentRequest(File file, String urlSuffix, Properties configuration) {
@@ -146,7 +144,6 @@ public class Communication {
 
         post.setHeader(AUTHORIZATION_HEADER, authCode);
         post.setHeader(CONTENT_TYPE_HEADER, getFileContentType(file));
-        post.setHeader(CONTENT_LENGTH_HEADER, getFileLength(file));
         if(!httpKeepAlive) {
             post.setHeader(CONNECTION_HEADER, CONNECTION_CLOSE);
         }
@@ -175,7 +172,6 @@ public class Communication {
 
         put.setHeader(AUTHORIZATION_HEADER, authCode);
         put.setHeader(CONTENT_TYPE_HEADER, getFileContentType(file));
-        put.setHeader(CONTENT_LENGTH_HEADER, getFileLength(file));
         if(!httpKeepAlive) {
             put.setHeader(CONNECTION_HEADER, CONNECTION_CLOSE);
         }
@@ -204,7 +200,7 @@ public class Communication {
         HttpDelete delete = new HttpDelete(requestUrl);
         String authCode = generateAuthcode(configuration);
 
-        delete.setHeader("Authorization", authCode);
+        delete.setHeader(AUTHORIZATION_HEADER, authCode);
         if(!httpKeepAlive) {
             delete.setHeader("Connection", "close");
         }
@@ -339,7 +335,7 @@ public class Communication {
             xmlResponse = EntityUtils.toString(entity,"UTF-8");
         }
         catch (IOException e) {
-            throw new ChargebackException("Exception connection to Vantiv", e);
+            throw new ChargebackException("There was an exception while fetching the response xml.", e);
         }
         finally {
             if (entity != null) {
@@ -347,6 +343,40 @@ public class Communication {
             }
         }
         return xmlResponse;
+    }
+
+    private void validateDocumentResponse(HttpResponse response, String filepath){
+        HttpEntity entity = null;
+        try{
+            entity = response.getEntity();
+            if (response.getStatusLine().getStatusCode() != 200) {
+                System.out.println(EntityUtils.toString(entity,"UTF-8"));
+                throw new ChargebackException(response.getStatusLine().getStatusCode() + ":" +
+                        response.getStatusLine().getReasonPhrase());
+            }
+
+            if(!"image/tiff".equals(entity.getContentType().getValue())){
+                String xmlResponse = EntityUtils.toString(entity,"UTF-8");
+                System.out.println(xmlResponse);
+                ChargebackDocumentUploadResponse responseObj = XMLConverter.generateDocumentResponse(xmlResponse);
+                throw new ChargebackException(responseObj.getResponseCode()+":"+responseObj.getResponseMessage());
+            }
+            InputStream is = entity.getContent();
+            FileOutputStream fos = new FileOutputStream(new File(filepath));
+            int inByte;
+            while((inByte = is.read()) != -1)
+                fos.write(inByte);
+            is.close();
+            fos.close();
+        }
+        catch (IOException e) {
+            throw new ChargebackException("There was an exception while fetching the requested document.", e);
+        }
+        finally {
+            if (entity != null) {
+                EntityUtils.consumeQuietly(entity);
+            }
+        }
     }
 
     /* Method to print request & response to console */
