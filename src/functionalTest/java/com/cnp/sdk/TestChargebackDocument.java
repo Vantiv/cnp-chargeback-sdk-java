@@ -1,6 +1,7 @@
 package com.cnp.sdk;
 
 import com.cnp.sdk.generate.ChargebackDocumentUploadResponse;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -16,6 +17,7 @@ import static junit.framework.Assert.assertTrue;
 public class TestChargebackDocument {
 
     private ChargebackDocument cbk;
+    private File documentToUpload;
 
     @Before
     public void setup() throws IOException {
@@ -28,11 +30,12 @@ public class TestChargebackDocument {
         config.setProperty("username", username);
         config.setProperty("password", password);
         cbk = new ChargebackDocument(config);
+        documentToUpload = new File("test.tiff");
+        documentToUpload.createNewFile();
     }
 
     @Test
     public void testChargebackUploadDocument(){
-        File documentToUpload = new File("test.tiff");
         ChargebackDocumentUploadResponse response = cbk.uploadDocument(123000L, documentToUpload);
         assertEquals("000", response.getResponseCode());
         assertEquals("Success", response.getResponseMessage());
@@ -47,7 +50,6 @@ public class TestChargebackDocument {
 
     @Test
     public void testChargebackReplaceDocument(){
-        File documentToUpload = new File("test.tiff");
         ChargebackDocumentUploadResponse response = cbk.replaceDocument(123000L, documentToUpload);
         assertEquals("000", response.getResponseCode());
         assertEquals("Success", response.getResponseMessage());
@@ -67,5 +69,10 @@ public class TestChargebackDocument {
         assertTrue(response.getDocumentIds().contains("doc.tiff"));
         assertEquals("000", response.getResponseCode());
         assertEquals("Success", response.getResponseMessage());
+    }
+
+    @After
+    public void tearDown(){
+        documentToUpload.delete();
     }
 }
