@@ -56,6 +56,7 @@ public class TestChargebackRetrieval {
         ChargebackApiCase case1 = response.getChargebackCases().get(0);
         assertNotNull(case1);
         assertNotNull(case1.getCaseId());
+        assertEquals("00000", case1.getToken());
     }
 
     @Test
