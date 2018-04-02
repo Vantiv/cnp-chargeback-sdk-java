@@ -9,7 +9,9 @@ apply plugin : 'maven'
 sourceCompatibility = 1.7
 
 repositories {
-    mavenCentral()
+    maven { url 'http://repo1.maven.org/maven2' }
+    jcenter { url 'http://jcenter.bintray.com/' }
+
 }
 
 configurations {
