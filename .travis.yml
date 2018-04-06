@@ -1,0 +1,14 @@
+language: java
+jdk:
+  - oraclejdk8
+os:
+  - linux
+sudo: false
+notifications:
+  on_success:
+    - change
+  on_failure:
+    - change
+script:
+  - gradle --info clean -Dhttps.protocols=TLSv1.2
+  - gradle --info build jTR kit -Dhttps.protocols=TLSv1.2
