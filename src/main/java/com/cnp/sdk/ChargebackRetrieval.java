@@ -69,32 +69,13 @@ public class ChargebackRetrieval {
      */
     public ChargebackRetrieval(Properties config) {
         this.config = config;
+        communication = new Communication();
     }
 
     ////////////////////////////////////////////////////////////////////
+    //                    ChargebackRetrieval API:                       //
+    ////////////////////////////////////////////////////////////////////
 
-    private String sendRetrievalRequest(String urlSuffix){
-        String xml = communication.getRequest(config, urlSuffix);
-        return xml;
-    }
-
-    private ChargebackRetrievalResponse getRetrievalReposnse(String key, String value){
-        String urlSuffix = URL_PATH + "?" + key + "=" + value;
-        String response = sendRetrievalRequest(urlSuffix);
-        return XMLConverter.generateRetrievalResponse(response);
-    }
-
-    private ChargebackRetrievalResponse getRetrievalReposnse(String key1, String value1, String key2, String value2){
-        String urlSuffix = URL_PATH + "?" + key1 + "=" + value1 + "&" + key2 + "=" + value2;
-        String response = sendRetrievalRequest(urlSuffix);
-        return XMLConverter.generateRetrievalResponse(response);
-    }
-
-    private ChargebackRetrievalResponse getRetrievalReposnse(Long caseId){
-        String urlSuffix = URL_PATH + caseId;
-        String response = sendRetrievalRequest(urlSuffix);
-        return XMLConverter.generateRetrievalResponse(response);
-    }
 
     public ChargebackRetrievalResponse getChargebacksByDate(String yyyy, String mm, String dd) {
         String date = yyyy+"-"+mm+"-"+dd;
@@ -125,5 +106,30 @@ public class ChargebackRetrieval {
 
     public ChargebackRetrievalResponse getActivityByARN(String arn){
         return getRetrievalReposnse("arn", arn);
+    }
+
+    private String sendRetrievalRequest(String urlSuffix){
+        return communication.getRequest(config, urlSuffix);
+    }
+
+
+    ////////////////////////////////////////////////////////////////////
+
+    private ChargebackRetrievalResponse getRetrievalReposnse(String key, String value){
+        String urlSuffix = URL_PATH + "?" + key + "=" + value;
+        String response = sendRetrievalRequest(urlSuffix);
+        return XMLConverter.generateRetrievalResponse(response);
+    }
+
+    private ChargebackRetrievalResponse getRetrievalReposnse(String key1, String value1, String key2, String value2){
+        String urlSuffix = URL_PATH + "?" + key1 + "=" + value1 + "&" + key2 + "=" + value2;
+        String response = sendRetrievalRequest(urlSuffix);
+        return XMLConverter.generateRetrievalResponse(response);
+    }
+
+    private ChargebackRetrievalResponse getRetrievalReposnse(Long caseId){
+        String urlSuffix = URL_PATH + caseId;
+        String response = sendRetrievalRequest(urlSuffix);
+        return XMLConverter.generateRetrievalResponse(response);
     }
 }

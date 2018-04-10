@@ -10,16 +10,10 @@ import javax.activation.MimetypesFileTypeMap;
 import javax.net.ssl.SSLContext;
 
 import com.cnp.sdk.generate.ChargebackDocumentUploadResponse;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
+import org.apache.http.*;
 import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.*;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
@@ -50,6 +44,7 @@ public class Communication {
     private final String CONNECTION_HEADER = "Connection";
     private final String CONNECTION_CLOSE = "close";
     private final String CONTENT_TYPE_CNP = "application/com.vantivcnp.services-v2+xml";
+    private final String CONNECTION_EXCEPTION_MESSAGE = "Error connecting to Vantiv";
 
     public Communication() {
         try {
@@ -102,21 +97,12 @@ public class Communication {
     }
 
     public File getDocumentRequest(String filepath, Properties configuration, String urlSuffix) {
-        String xmlResponse;
-        File document = null;
-        boolean httpKeepAlive = Boolean.valueOf(configuration.getProperty("httpKeepAlive", "true"));
-        RequestConfig requestConfig = generateRequestConfig(configuration);
+        File document;
 
         String requestUrl = configuration.getProperty("url") + urlSuffix;
         HttpGet get = new HttpGet(requestUrl);
-        String authCode = generateAuthcode(configuration);
 
-        get.setHeader(AUTHORIZATION_HEADER, authCode);
-        if(!httpKeepAlive) {
-            get.setHeader(CONNECTION_HEADER, CONNECTION_CLOSE);
-        }
-
-        get.setConfig(requestConfig);
+        prepareHttpRequest(get, configuration);
 
         HttpEntity entity = null;
         try {
@@ -124,7 +110,7 @@ public class Communication {
             validateDocumentResponse(response, filepath);
             document = new File(filepath);
         } catch (IOException e) {
-            throw new ChargebackException("Exception connection to Vantiv", e);
+            throw new ChargebackException(CONNECTION_EXCEPTION_MESSAGE, e);
         } finally {
             if (entity != null) {
                 EntityUtils.consumeQuietly(entity);
@@ -135,148 +121,81 @@ public class Communication {
     }
 
     public String postDocumentRequest(File file, String urlSuffix, Properties configuration) {
-        String xmlResponse;
-        boolean httpKeepAlive = Boolean.valueOf(configuration.getProperty("httpKeepAlive", "false"));
-        RequestConfig requestConfig = generateRequestConfig(configuration);
         String requestUrl = configuration.getProperty("url") + urlSuffix;
         HttpPost post = new HttpPost(requestUrl);
-        String authCode = generateAuthcode(configuration);
-
-        post.setHeader(AUTHORIZATION_HEADER, authCode);
         post.setHeader(CONTENT_TYPE_HEADER, getFileContentType(file));
-        if(!httpKeepAlive) {
-            post.setHeader(CONNECTION_HEADER, CONNECTION_CLOSE);
-        }
-
-        post.setConfig(requestConfig);
-        try {
-            post.setEntity(new FileEntity(file));
-            HttpResponse response = httpClient.execute(post);
-            xmlResponse = validateResponse(response);
-            printToConsole(null, xmlResponse, configuration);
-        } catch (IOException e) {
-            throw new ChargebackException("Exception connection to Litle", e);
-        } finally {
-            post.abort();
-        }
-        return xmlResponse;
+        post.setEntity(new FileEntity(file));
+        return requestToCnp(post, configuration);
     }
 
     public String putDocumentRequest(File file, String urlSuffix, Properties configuration) {
-        String xmlResponse;
-        boolean httpKeepAlive = Boolean.valueOf(configuration.getProperty("httpKeepAlive", "false"));
-        RequestConfig requestConfig = generateRequestConfig(configuration);
         String requestUrl = configuration.getProperty("url") + urlSuffix;
         HttpPut put = new HttpPut(requestUrl);
-        String authCode = generateAuthcode(configuration);
-
-        put.setHeader(AUTHORIZATION_HEADER, authCode);
         put.setHeader(CONTENT_TYPE_HEADER, getFileContentType(file));
-        if(!httpKeepAlive) {
-            put.setHeader(CONNECTION_HEADER, CONNECTION_CLOSE);
-        }
-
-        put.setConfig(requestConfig);
-        try {
-            put.setEntity(new FileEntity(file));
-            HttpResponse response = httpClient.execute(put);
-            xmlResponse = validateResponse(response);
-            printToConsole(null, xmlResponse, configuration);
-        } catch (IOException e) {
-            throw new ChargebackException("Exception connection to Vantiv", e);
-        } finally {
-            put.abort();
-        }
-        return xmlResponse;
+        return requestToCnp(put, configuration);
     }
 
     public String deleteDocumentRequest(Properties configuration, String urlSuffix) {
-        String xmlResponse;
-
-        boolean httpKeepAlive = Boolean.valueOf(configuration.getProperty("httpKeepAlive", "false"));
-        RequestConfig requestConfig = generateRequestConfig(configuration);
-
         String requestUrl = configuration.getProperty("url") + urlSuffix;
         HttpDelete delete = new HttpDelete(requestUrl);
-        String authCode = generateAuthcode(configuration);
-
-        delete.setHeader(AUTHORIZATION_HEADER, authCode);
-        if(!httpKeepAlive) {
-            delete.setHeader("Connection", "close");
-        }
-
-        delete.setConfig(requestConfig);
-
-        try {
-            HttpResponse response = httpClient.execute(delete);
-            xmlResponse = validateResponse(response);
-            printToConsole(null, xmlResponse, configuration);
-        } catch (IOException e) {
-            throw new ChargebackException("Exception connection to Vantiv", e);
-        } finally {
-            delete.abort();
-        }
-        return xmlResponse;
+        return requestToCnp(delete, configuration);
     }
 
     public String getRequest(Properties configuration, String urlSuffix) {
-        String xmlResponse;
-
-        boolean httpKeepAlive = Boolean.valueOf(configuration.getProperty("httpKeepAlive", "false"));
-        RequestConfig requestConfig = generateRequestConfig(configuration);
-
         String requestUrl = configuration.getProperty("url") + urlSuffix;
         HttpGet get = new HttpGet(requestUrl);
-
-        String authCode = generateAuthcode(configuration);
-        get.setHeader(AUTHORIZATION_HEADER, authCode);
         get.setHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_CNP);
         get.setHeader(ACCEPT_HEADER, CONTENT_TYPE_CNP);
-        if(!httpKeepAlive) {
-            get.setHeader(CONNECTION_HEADER, CONNECTION_CLOSE);
-        }
+        return requestToCnp(get, configuration);
+    }
 
-        get.setConfig(requestConfig);
+    public String putRequest(Properties configuration, String urlSuffix, String xmlRequest) {
+        String requestUrl = configuration.getProperty("url") + urlSuffix;
+        HttpPut put = new HttpPut(requestUrl);
+        put.setHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_CNP);
+        put.setHeader(ACCEPT_HEADER, CONTENT_TYPE_CNP);
+        put.setEntity(new StringEntity(xmlRequest,"UTF-8"));
+        return requestToCnp(put, configuration);
+    }
+
+    /* Sends given HttpRequest to server, after preparing it */
+    public String requestToCnp(HttpRequestBase baseRequest, Properties configuration){
+        String xmlResponse;
+        prepareHttpRequest(baseRequest, configuration);
 
         try {
-            HttpResponse response = httpClient.execute(get);
-            xmlResponse = validateResponse(response);
-            printToConsole(null, xmlResponse, configuration);
-        } catch (IOException e) {
-            throw new ChargebackException("Exception connection to Vantiv", e);
-        } finally {
-            get.abort();
+            xmlResponse = execHttpRequest(baseRequest, configuration);
+        } catch (Exception e) {
+            throw e;
         }
         return xmlResponse;
     }
 
-    public String putRequest(Properties configuration, String urlSuffix, String xmlRequest) {
-        String xmlResponse;
-
+    /* Prepare HttpRequest: set default headers, configs */
+    public void prepareHttpRequest(HttpRequestBase baseRequest, Properties configuration){
         boolean httpKeepAlive = Boolean.valueOf(configuration.getProperty("httpKeepAlive", "false"));
-        RequestConfig requestConfig = generateRequestConfig(configuration);
-
-        String requestUrl = configuration.getProperty("url") + urlSuffix;
-        HttpPut put = new HttpPut(requestUrl);
+        RequestConfig requestConfig = generateHttpRequestConfig(configuration);
 
         String authCode = generateAuthcode(configuration);
-        put.setHeader(AUTHORIZATION_HEADER, authCode);
-        put.setHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_CNP);
-        put.setHeader(ACCEPT_HEADER, CONTENT_TYPE_CNP);
+        baseRequest.setHeader(AUTHORIZATION_HEADER, authCode);
         if(!httpKeepAlive) {
-            put.setHeader(CONNECTION_HEADER, CONNECTION_CLOSE);
+            baseRequest.setHeader(CONNECTION_HEADER, CONNECTION_CLOSE);
         }
 
-        put.setConfig(requestConfig);
+        baseRequest.setConfig(requestConfig);
+    }
+
+    /* Executes HttpRequest, receieves response and validates it */
+    public String execHttpRequest(HttpRequestBase baseRequest, Properties configuration){
+        String xmlResponse;
         try {
-            put.setEntity(new StringEntity(xmlRequest,"UTF-8"));
-            HttpResponse response = httpClient.execute(put);
+            HttpResponse response = httpClient.execute(baseRequest);
             xmlResponse = validateResponse(response);
-            printToConsole(xmlRequest, xmlResponse, configuration);
+            printToConsole(xmlResponse, configuration);
         } catch (IOException e) {
-            throw new ChargebackException("Exception connection to Vantiv", e);
+            throw new ChargebackException(CONNECTION_EXCEPTION_MESSAGE, e);
         } finally {
-            put.abort();
+            baseRequest.abort();
         }
         return xmlResponse;
     }
@@ -299,7 +218,7 @@ public class Communication {
     }
 
     /* Method to generate RequestConfig object for HttpRequests */
-    private RequestConfig generateRequestConfig(Properties configuration){
+    private RequestConfig generateHttpRequestConfig(Properties configuration){
         String proxyHost = configuration.getProperty("proxyHost");
         String proxyPort = configuration.getProperty("proxyPort");
         int httpTimeout = Integer.valueOf(configuration.getProperty("timeout", "6000"));
@@ -361,6 +280,7 @@ public class Communication {
                 ChargebackDocumentUploadResponse responseObj = XMLConverter.generateDocumentResponse(xmlResponse);
                 throw new ChargebackException(responseObj.getResponseCode()+":"+responseObj.getResponseMessage());
             }
+
             InputStream is = entity.getContent();
             FileOutputStream fos = new FileOutputStream(new File(filepath));
             int inByte;
@@ -383,13 +303,19 @@ public class Communication {
     private void printToConsole(String xmlRequest, String xmlResponse, Properties configuration){
         boolean printxml = "true".equalsIgnoreCase(configuration.getProperty("printxml"));
         boolean neuterXml = "true".equalsIgnoreCase(configuration.getProperty("neuterXml"));
-        if (printxml && xmlRequest!=null) {
+        if (printxml) {
             if (neuterXml) {
                 xmlRequest = neuterXml(xmlRequest);
+                xmlResponse = neuterXml(xmlResponse);
             }
             System.out.println("Request XML: " + xmlRequest);
+            System.out.println("Response XML: " + xmlResponse);
         }
+    }
 
+    private void printToConsole(String xmlResponse, Properties configuration){
+        boolean printxml = "true".equalsIgnoreCase(configuration.getProperty("printxml"));
+        boolean neuterXml = "true".equalsIgnoreCase(configuration.getProperty("neuterXml"));
         if (printxml) {
             if (neuterXml) {
                 xmlResponse = neuterXml(xmlResponse);

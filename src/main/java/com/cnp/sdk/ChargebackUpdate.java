@@ -69,21 +69,13 @@ public class ChargebackUpdate {
      */
     public ChargebackUpdate(Properties config) {
         this.config = config;
+        communication = new Communication();
     }
 
     ////////////////////////////////////////////////////////////////////
+    //                    ChargebackUpdate API:                       //
+    ////////////////////////////////////////////////////////////////////
 
-    private String sendUpdateRequest(Long caseId, String xmlRequest){
-        String urlSuffix = URL_PATH + caseId;
-        String xml = communication.putRequest(config, urlSuffix, xmlRequest);
-        return xml;
-    }
-
-    private ChargebackUpdateResponse getUpdateResponse(Long caseId, ChargebackUpdateRequest request){
-        String xmlRequest = XMLConverter.generateUpdateRequest(request);
-        String response = sendUpdateRequest(caseId, xmlRequest);
-        return XMLConverter.generateUpdateResponse(response);
-    }
 
     public ChargebackUpdateResponse assignCaseToUser(Long caseId, String userId, String note) {
         ChargebackUpdateRequest request = new ChargebackUpdateRequest();
@@ -115,11 +107,33 @@ public class ChargebackUpdate {
         return getUpdateResponse(caseId, request);
     }
 
+    public ChargebackUpdateResponse representCase(Long caseId, String note){
+        ChargebackUpdateRequest request = new ChargebackUpdateRequest();
+        request.setActivityType(ActivityType.MERCHANT_REPRESENT);
+        request.setNote(note);
+        return getUpdateResponse(caseId, request);
+    }
+
     public ChargebackUpdateResponse respondToRetrievalRequest(Long caseId, String note){
         ChargebackUpdateRequest request = new ChargebackUpdateRequest();
         request.setActivityType(ActivityType.MERCHANT_RESPOND);
         request.setNote(note);
         return getUpdateResponse(caseId, request);
+    }
+
+
+    ////////////////////////////////////////////////////////////////////
+
+    private ChargebackUpdateResponse getUpdateResponse(Long caseId, ChargebackUpdateRequest request){
+        String xmlRequest = XMLConverter.generateUpdateRequest(request);
+        String response = sendUpdateRequest(caseId, xmlRequest);
+        return XMLConverter.generateUpdateResponse(response);
+    }
+
+    private String sendUpdateRequest(Long caseId, String xmlRequest){
+        String urlSuffix = URL_PATH + caseId;
+        String xml = communication.putRequest(config, urlSuffix, xmlRequest);
+        return xml;
     }
 
 }
