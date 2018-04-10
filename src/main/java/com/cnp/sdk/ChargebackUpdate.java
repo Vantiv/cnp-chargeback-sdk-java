@@ -20,7 +20,7 @@ import java.util.Properties;
 public class ChargebackUpdate {
     private Properties config;
     private Communication communication;
-    private final String URL_PATH = "/services/chargebacks/";
+    private String baseurl;
 
     public ChargebackUpdate() {
 
@@ -47,6 +47,8 @@ public class ChargebackUpdate {
                 }
             }
         }
+
+        baseurl = config.getProperty("url");
     }
 
     /**
@@ -70,6 +72,7 @@ public class ChargebackUpdate {
     public ChargebackUpdate(Properties config) {
         this.config = config;
         communication = new Communication();
+        baseurl = config.getProperty("url");
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -131,9 +134,8 @@ public class ChargebackUpdate {
     }
 
     private String sendUpdateRequest(Long caseId, String xmlRequest){
-        String urlSuffix = URL_PATH + caseId;
-        String xml = communication.putRequest(config, urlSuffix, xmlRequest);
-        return xml;
+        String requestUrl = baseurl + caseId;
+        return communication.httpPutRequest(xmlRequest, requestUrl, config);
     }
 
 }

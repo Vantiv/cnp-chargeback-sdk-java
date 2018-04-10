@@ -38,13 +38,12 @@ public class Communication {
     private static final String NEUTER_STR = "NEUTERED";
     private CloseableHttpClient httpClient;
     private final int KEEP_ALIVE_DURATION = 8000;
-    private final String AUTHORIZATION_HEADER = "Authorization";
     private final String CONTENT_TYPE_HEADER = "Content-Type";
+    private final String CONTENT_TYPE_VALUE = "application/com.vantivcnp.services-v2+xml";
     private final String ACCEPT_HEADER = "Accept";
-    private final String CONNECTION_HEADER = "Connection";
-    private final String CONNECTION_CLOSE = "close";
-    private final String CONTENT_TYPE_CNP = "application/com.vantivcnp.services-v2+xml";
+    private final String CONTENT_LENGTH_HEADER = "Content-Length";
     private final String CONNECTION_EXCEPTION_MESSAGE = "Error connecting to Vantiv";
+    private final String XML_ENCODING = "UTF-8";
 
     public Communication() {
         try {
@@ -96,13 +95,11 @@ public class Communication {
         return bestProtocol;
     }
 
-    public File getDocumentRequest(String filepath, Properties configuration, String urlSuffix) {
+    public File httpGetDocumentRequest(String filepath, String requestUrl, Properties config) {
         File document;
-
-        String requestUrl = configuration.getProperty("url") + urlSuffix;
         HttpGet get = new HttpGet(requestUrl);
 
-        prepareHttpRequest(get, configuration);
+        prepareHttpRequest(get, config);
 
         HttpEntity entity = null;
         try {
@@ -120,78 +117,92 @@ public class Communication {
         return document;
     }
 
-    public String postDocumentRequest(File file, String urlSuffix, Properties configuration) {
-        String requestUrl = configuration.getProperty("url") + urlSuffix;
+    public String httpPostDocumentRequest(File file, String requestUrl, Properties config) {
         HttpPost post = new HttpPost(requestUrl);
         post.setHeader(CONTENT_TYPE_HEADER, getFileContentType(file));
+        //TODO: Set Content-length header
+//        post.setHeader(CONTENT_LENGTH_HEADER, getFileLength(file));
         post.setEntity(new FileEntity(file));
-        return requestToCnp(post, configuration);
+        return sendHttpRequestToCnp(post, config);
     }
 
-    public String putDocumentRequest(File file, String urlSuffix, Properties configuration) {
-        String requestUrl = configuration.getProperty("url") + urlSuffix;
+    public String httpPutDocumentRequest(File file, String requestUrl, Properties config) {
         HttpPut put = new HttpPut(requestUrl);
         put.setHeader(CONTENT_TYPE_HEADER, getFileContentType(file));
-        return requestToCnp(put, configuration);
+        //TODO: Set Content-length header
+//        put.setHeader(CONTENT_LENGTH_HEADER, getFileLength(file));
+        put.setEntity(new FileEntity(file));
+        return sendHttpRequestToCnp(put, config);
     }
 
-    public String deleteDocumentRequest(Properties configuration, String urlSuffix) {
-        String requestUrl = configuration.getProperty("url") + urlSuffix;
+    public String httpDeleteDocumentRequest(String requestUrl, Properties config) {
         HttpDelete delete = new HttpDelete(requestUrl);
-        return requestToCnp(delete, configuration);
+        return sendHttpRequestToCnp(delete, config);
     }
 
-    public String getRequest(Properties configuration, String urlSuffix) {
-        String requestUrl = configuration.getProperty("url") + urlSuffix;
+    public String httpGetRequest(String requestUrl, Properties config) {
         HttpGet get = new HttpGet(requestUrl);
-        get.setHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_CNP);
-        get.setHeader(ACCEPT_HEADER, CONTENT_TYPE_CNP);
-        return requestToCnp(get, configuration);
+        get.setHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_VALUE);
+        get.setHeader(ACCEPT_HEADER, CONTENT_TYPE_VALUE);
+        return sendHttpRequestToCnp(get, config);
     }
 
-    public String putRequest(Properties configuration, String urlSuffix, String xmlRequest) {
-        String requestUrl = configuration.getProperty("url") + urlSuffix;
+    public String httpPutRequest(String xmlRequest, String requestUrl, Properties config) {
         HttpPut put = new HttpPut(requestUrl);
-        put.setHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_CNP);
-        put.setHeader(ACCEPT_HEADER, CONTENT_TYPE_CNP);
-        put.setEntity(new StringEntity(xmlRequest,"UTF-8"));
-        return requestToCnp(put, configuration);
+        put.setHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_VALUE);
+        put.setHeader(ACCEPT_HEADER, CONTENT_TYPE_VALUE);
+        put.setEntity(new StringEntity(xmlRequest, XML_ENCODING));
+        printToConsole("Request XML: ", xmlRequest, config);
+        return sendHttpRequestToCnp(put, config);
     }
 
-    /* Sends given HttpRequest to server, after preparing it */
-    public String requestToCnp(HttpRequestBase baseRequest, Properties configuration){
+    ////////////////////////////////////////////////////////////////////
+
+    /**
+     *  Method to send given HttpRequest to server, after preparing it. Returns response from server
+     */
+    public String sendHttpRequestToCnp(HttpRequestBase baseRequest, Properties config){
         String xmlResponse;
-        prepareHttpRequest(baseRequest, configuration);
+        prepareHttpRequest(baseRequest, config);
 
         try {
-            xmlResponse = execHttpRequest(baseRequest, configuration);
+            xmlResponse = execHttpRequest(baseRequest, config);
         } catch (Exception e) {
             throw e;
         }
         return xmlResponse;
     }
 
-    /* Prepare HttpRequest: set default headers, configs */
-    public void prepareHttpRequest(HttpRequestBase baseRequest, Properties configuration){
-        boolean httpKeepAlive = Boolean.valueOf(configuration.getProperty("httpKeepAlive", "false"));
-        RequestConfig requestConfig = generateHttpRequestConfig(configuration);
+    /**
+     *  Method to prepare HttpRequest: set default headers, configs to given http request
+     */
+    public void prepareHttpRequest(HttpRequestBase baseRequest, Properties config){
+        String proxyHost = config.getProperty("proxyHost");
+        String proxyPort = config.getProperty("proxyPort");
+        int httpTimeout = Integer.valueOf(config.getProperty("timeout", "6000"));
+        String username = config.getProperty("username");
+        String password = config.getProperty("password");
+        boolean httpKeepAlive = Boolean.valueOf(config.getProperty("httpKeepAlive", "false"));
 
-        String authCode = generateAuthcode(configuration);
-        baseRequest.setHeader(AUTHORIZATION_HEADER, authCode);
+        RequestConfig requestConfig = generateHttpRequestConfig(proxyHost, proxyPort, httpTimeout);
+        String authCode = generateAuthcode(username, password);
+        baseRequest.setHeader("Authorization", authCode);
         if(!httpKeepAlive) {
-            baseRequest.setHeader(CONNECTION_HEADER, CONNECTION_CLOSE);
+            baseRequest.setHeader("Connection", "close");
         }
 
         baseRequest.setConfig(requestConfig);
     }
 
-    /* Executes HttpRequest, receieves response and validates it */
-    public String execHttpRequest(HttpRequestBase baseRequest, Properties configuration){
+    /**
+     *  Method to executes HttpRequest: given http request is sent, and receieved response is returned after validation
+     */
+    public String execHttpRequest(HttpRequestBase baseRequest, Properties config){
         String xmlResponse;
         try {
             HttpResponse response = httpClient.execute(baseRequest);
             xmlResponse = validateResponse(response);
-            printToConsole(xmlResponse, configuration);
+            printToConsole("Response XML: ", xmlResponse, config);
         } catch (IOException e) {
             throw new ChargebackException(CONNECTION_EXCEPTION_MESSAGE, e);
         } finally {
@@ -200,31 +211,34 @@ public class Communication {
         return xmlResponse;
     }
 
-    /* Generate base64 encoded code for authentication */
-    private String generateAuthcode(Properties configuration){
-        String username = configuration.getProperty("username");
-        String password = configuration.getProperty("password");
-
+    /**
+     *  Method to generate and return the base64 encoded code for authentication
+     */
+    private String generateAuthcode(String username, String password){
         return "Basic " + new String(Base64.encodeBase64((username + ":" + password).getBytes()));
     }
 
-    /* Get content-type for input file */
+    /**
+     *  Method to return the content-type for input file
+     */
     private String getFileContentType(File file){
         return new MimetypesFileTypeMap().getContentType(file);
     }
 
+    /**
+     *  Method to return the content-length for input file
+     */
     private String getFileLength(File file){
         return String.valueOf(file.length());
     }
 
-    /* Method to generate RequestConfig object for HttpRequests */
-    private RequestConfig generateHttpRequestConfig(Properties configuration){
-        String proxyHost = configuration.getProperty("proxyHost");
-        String proxyPort = configuration.getProperty("proxyPort");
-        int httpTimeout = Integer.valueOf(configuration.getProperty("timeout", "6000"));
+    /**
+     *  Method to generate and return the RequestConfig object for HttpRequests
+     */
+    private RequestConfig generateHttpRequestConfig(String proxyHost, String proxyPort, int httpTimeout){
         HttpHost proxy;
         RequestConfig requestConfig;
-        if (proxyHost != null && proxyHost.length() > 0 && proxyPort != null && proxyHost.length() > 0) {
+        if (proxyHost != null && proxyHost.length() > 0 && proxyPort != null) {
             proxy = new HttpHost(proxyHost, Integer.valueOf(proxyPort));
             requestConfig = RequestConfig.copy(RequestConfig.DEFAULT)
                     .setProxy(proxy)
@@ -240,18 +254,21 @@ public class Communication {
         return requestConfig;
     }
 
-    /* Method to check Http response code is a Success response */
+    /**
+     *  method to Validate response: check that the Http response code is a Success response
+     *                               and return the resonse if valid
+     */
     private String validateResponse(HttpResponse response){
         HttpEntity entity = null;
         String xmlResponse;
         try{
             entity = response.getEntity();
             if (response.getStatusLine().getStatusCode() != 200) {
-                System.out.println(EntityUtils.toString(entity,"UTF-8"));
+                System.out.println(EntityUtils.toString(entity,XML_ENCODING));
                 throw new ChargebackException(response.getStatusLine().getStatusCode() + ":" +
                         response.getStatusLine().getReasonPhrase());
             }
-            xmlResponse = EntityUtils.toString(entity,"UTF-8");
+            xmlResponse = EntityUtils.toString(entity,XML_ENCODING);
         }
         catch (IOException e) {
             throw new ChargebackException("There was an exception while fetching the response xml.", e);
@@ -264,18 +281,22 @@ public class Communication {
         return xmlResponse;
     }
 
+    /**
+     *  Method to Validate document response: check that the Http response code is a Success response
+     *                                        and the document returned is of the right type
+     */
     private void validateDocumentResponse(HttpResponse response, String filepath){
         HttpEntity entity = null;
         try{
             entity = response.getEntity();
             if (response.getStatusLine().getStatusCode() != 200) {
-                System.out.println(EntityUtils.toString(entity,"UTF-8"));
+                System.out.println(EntityUtils.toString(entity,XML_ENCODING));
                 throw new ChargebackException(response.getStatusLine().getStatusCode() + ":" +
                         response.getStatusLine().getReasonPhrase());
             }
 
             if(!"image/tiff".equals(entity.getContentType().getValue())){
-                String xmlResponse = EntityUtils.toString(entity,"UTF-8");
+                String xmlResponse = EntityUtils.toString(entity,XML_ENCODING);
                 System.out.println(xmlResponse);
                 ChargebackDocumentUploadResponse responseObj = XMLConverter.generateDocumentResponse(xmlResponse);
                 throw new ChargebackException(responseObj.getResponseCode()+":"+responseObj.getResponseMessage());
@@ -299,32 +320,23 @@ public class Communication {
         }
     }
 
-    /* Method to print request & response to console */
-    private void printToConsole(String xmlRequest, String xmlResponse, Properties configuration){
-        boolean printxml = "true".equalsIgnoreCase(configuration.getProperty("printxml"));
-        boolean neuterXml = "true".equalsIgnoreCase(configuration.getProperty("neuterXml"));
+    /**
+     *  Method to print xml to console: a prefixMessage is appended to given xml before printing to console
+     */
+    private void printToConsole(String prefixMessage, String xml, Properties config){
+        boolean printxml = "true".equalsIgnoreCase(config.getProperty("printxml"));
+        boolean neuterXml = "true".equalsIgnoreCase(config.getProperty("neuterXml"));
         if (printxml) {
             if (neuterXml) {
-                xmlRequest = neuterXml(xmlRequest);
-                xmlResponse = neuterXml(xmlResponse);
+                xml = neuterXml(xml);
             }
-            System.out.println("Request XML: " + xmlRequest);
-            System.out.println("Response XML: " + xmlResponse);
+            System.out.println(prefixMessage + xml);
         }
     }
 
-    private void printToConsole(String xmlResponse, Properties configuration){
-        boolean printxml = "true".equalsIgnoreCase(configuration.getProperty("printxml"));
-        boolean neuterXml = "true".equalsIgnoreCase(configuration.getProperty("neuterXml"));
-        if (printxml) {
-            if (neuterXml) {
-                xmlResponse = neuterXml(xmlResponse);
-            }
-            System.out.println("Response XML: " + xmlResponse);
-        }
-    }
-
-    /* Method to neuter out sensitive information from xml */
+    /**
+     *  Method to neuter out sensitive information from xml
+     */
     public String neuterXml(String xml) {
         if (xml == null) {
             return xml;

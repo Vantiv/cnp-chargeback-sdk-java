@@ -2,7 +2,6 @@ package com.cnp.sdk;
 
 import com.cnp.sdk.generate.*;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -20,7 +19,7 @@ public class ChargebackRetrieval {
 
     private Properties config;
     private Communication communication;
-    private final String URL_PATH = "/services/chargebacks/";
+    private String baseurl;
 
     public ChargebackRetrieval() {
 
@@ -47,6 +46,8 @@ public class ChargebackRetrieval {
                 }
             }
         }
+
+        baseurl = config.getProperty("url");
     }
 
     /**
@@ -70,6 +71,7 @@ public class ChargebackRetrieval {
     public ChargebackRetrieval(Properties config) {
         this.config = config;
         communication = new Communication();
+        baseurl = config.getProperty("url");
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -108,28 +110,28 @@ public class ChargebackRetrieval {
         return getRetrievalReposnse("arn", arn);
     }
 
-    private String sendRetrievalRequest(String urlSuffix){
-        return communication.getRequest(config, urlSuffix);
-    }
-
 
     ////////////////////////////////////////////////////////////////////
 
     private ChargebackRetrievalResponse getRetrievalReposnse(String key, String value){
-        String urlSuffix = URL_PATH + "?" + key + "=" + value;
+        String urlSuffix = "?" + key + "=" + value;
         String response = sendRetrievalRequest(urlSuffix);
         return XMLConverter.generateRetrievalResponse(response);
     }
 
     private ChargebackRetrievalResponse getRetrievalReposnse(String key1, String value1, String key2, String value2){
-        String urlSuffix = URL_PATH + "?" + key1 + "=" + value1 + "&" + key2 + "=" + value2;
+        String urlSuffix = "?" + key1 + "=" + value1 + "&" + key2 + "=" + value2;
         String response = sendRetrievalRequest(urlSuffix);
         return XMLConverter.generateRetrievalResponse(response);
     }
 
     private ChargebackRetrievalResponse getRetrievalReposnse(Long caseId){
-        String urlSuffix = URL_PATH + caseId;
-        String response = sendRetrievalRequest(urlSuffix);
+        String response = sendRetrievalRequest(String.valueOf(caseId));
         return XMLConverter.generateRetrievalResponse(response);
+    }
+
+    private String sendRetrievalRequest(String urlSuffix){
+        String requestUrl = baseurl + urlSuffix;
+        return communication.httpGetRequest(requestUrl, config);
     }
 }

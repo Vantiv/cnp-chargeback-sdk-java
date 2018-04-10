@@ -19,7 +19,7 @@ import java.util.Properties;
 public class ChargebackDocument {
     private Properties config;
     private Communication communication;
-    private final String URL_PATH = "/services/chargebacks/";
+    private String baseUrl;
 
     public ChargebackDocument() {
 
@@ -46,6 +46,8 @@ public class ChargebackDocument {
                 }
             }
         }
+
+        baseUrl = config.getProperty("url");
     }
 
     /**
@@ -69,6 +71,7 @@ public class ChargebackDocument {
     public ChargebackDocument(Properties config) {
         this.config = config;
         communication = new Communication();
+        baseUrl = config.getProperty("url");
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -77,31 +80,31 @@ public class ChargebackDocument {
 
 
     public ChargebackDocumentUploadResponse uploadDocument(Long caseId, File document){
-        String urlSuffix = URL_PATH + "upload/" + caseId + "/" + document.getName();
-        String xml = communication.postDocumentRequest(document, urlSuffix, config);
+        String requestUrl = baseUrl + "upload/" + caseId + "/" + document.getName();
+        String xml = communication.httpPostDocumentRequest(document, requestUrl, config);
         return XMLConverter.generateDocumentResponse(xml);
     }
 
     public File retrieveDocument(Long caseId, String documentId, String filepath){
-        String urlSuffix = URL_PATH + "retrieve/" + caseId + "/" + documentId;
-        return communication.getDocumentRequest(filepath, config, urlSuffix);
+        String requestUrl = baseUrl + "retrieve/" + caseId + "/" + documentId;
+        return communication.httpGetDocumentRequest(filepath, requestUrl, config);
     }
 
     public ChargebackDocumentUploadResponse replaceDocument(Long caseId, File document){
-        String urlSuffix = URL_PATH + "replace/" + caseId + "/" + document.getName();
-        String xml = communication.putDocumentRequest(document, urlSuffix, config);
+        String requestUrl = baseUrl + "replace/" + caseId + "/" + document.getName();
+        String xml = communication.httpPutDocumentRequest(document, requestUrl, config);
         return XMLConverter.generateDocumentResponse(xml);
     }
 
     public ChargebackDocumentUploadResponse deleteDocument(Long caseId, String documentId){
-        String urlSuffix = URL_PATH + "remove/" + caseId + "/" + documentId;
-        String xml = communication.deleteDocumentRequest(config, urlSuffix);
+        String requestUrl = baseUrl + "remove/" + caseId + "/" + documentId;
+        String xml = communication.httpDeleteDocumentRequest(requestUrl, config);
         return XMLConverter.generateDocumentResponse(xml);
     }
 
     public ChargebackDocumentUploadResponse listDocuments(Long caseId){
-        String urlSuffix = URL_PATH + "list/" + caseId;
-        String xml = communication.getRequest(config, urlSuffix);
+        String requestUrl = baseUrl + "list/" + caseId;
+        String xml = communication.httpGetRequest(requestUrl, config);
         return XMLConverter.generateDocumentResponse(xml);
     }
     
