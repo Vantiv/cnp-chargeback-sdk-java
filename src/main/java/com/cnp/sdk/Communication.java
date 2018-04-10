@@ -41,7 +41,6 @@ public class Communication {
     private final String CONTENT_TYPE_HEADER = "Content-Type";
     private final String CONTENT_TYPE_VALUE = "application/com.vantivcnp.services-v2+xml";
     private final String ACCEPT_HEADER = "Accept";
-    private final String CONTENT_LENGTH_HEADER = "Content-Length";
     private final String CONNECTION_EXCEPTION_MESSAGE = "Error connecting to Vantiv";
     private final String XML_ENCODING = "UTF-8";
 
@@ -98,10 +97,8 @@ public class Communication {
     public File httpGetDocumentRequest(String filepath, String requestUrl, Properties config) {
         File document;
         HttpGet get = new HttpGet(requestUrl);
-
         prepareHttpRequest(get, config);
 
-        HttpEntity entity = null;
         try {
             HttpResponse response = httpClient.execute(get);
             validateDocumentResponse(response, filepath);
@@ -109,9 +106,6 @@ public class Communication {
         } catch (IOException e) {
             throw new ChargebackException(CONNECTION_EXCEPTION_MESSAGE, e);
         } finally {
-            if (entity != null) {
-                EntityUtils.consumeQuietly(entity);
-            }
             get.abort();
         }
         return document;
@@ -120,8 +114,6 @@ public class Communication {
     public String httpPostDocumentRequest(File file, String requestUrl, Properties config) {
         HttpPost post = new HttpPost(requestUrl);
         post.setHeader(CONTENT_TYPE_HEADER, getFileContentType(file));
-        //TODO: Set Content-length header
-//        post.setHeader(CONTENT_LENGTH_HEADER, getFileLength(file));
         post.setEntity(new FileEntity(file));
         return sendHttpRequestToCnp(post, config);
     }
@@ -129,8 +121,6 @@ public class Communication {
     public String httpPutDocumentRequest(File file, String requestUrl, Properties config) {
         HttpPut put = new HttpPut(requestUrl);
         put.setHeader(CONTENT_TYPE_HEADER, getFileContentType(file));
-        //TODO: Set Content-length header
-//        put.setHeader(CONTENT_LENGTH_HEADER, getFileLength(file));
         put.setEntity(new FileEntity(file));
         return sendHttpRequestToCnp(put, config);
     }
@@ -226,7 +216,7 @@ public class Communication {
     }
 
     /**
-     *  Method to return the content-length for input file
+     *  Method to return the content-length for input file in bytes
      */
     private String getFileLength(File file){
         return String.valueOf(file.length());
@@ -290,16 +280,16 @@ public class Communication {
         try{
             entity = response.getEntity();
             if (response.getStatusLine().getStatusCode() != 200) {
-                System.out.println(EntityUtils.toString(entity,XML_ENCODING));
+                System.out.println(EntityUtils.toString(entity, XML_ENCODING));
                 throw new ChargebackException(response.getStatusLine().getStatusCode() + ":" +
                         response.getStatusLine().getReasonPhrase());
             }
 
             if(!"image/tiff".equals(entity.getContentType().getValue())){
-                String xmlResponse = EntityUtils.toString(entity,XML_ENCODING);
+                String xmlResponse = EntityUtils.toString(entity, XML_ENCODING);
                 System.out.println(xmlResponse);
                 ChargebackDocumentUploadResponse responseObj = XMLConverter.generateDocumentResponse(xmlResponse);
-                throw new ChargebackException(responseObj.getResponseCode()+":"+responseObj.getResponseMessage());
+                throw new ChargebackException(responseObj.getResponseCode() + ":" + responseObj.getResponseMessage());
             }
 
             InputStream is = entity.getContent();

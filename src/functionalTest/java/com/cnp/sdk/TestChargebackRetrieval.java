@@ -4,6 +4,9 @@ import com.cnp.sdk.generate.ChargebackApiCase;
 import com.cnp.sdk.generate.ChargebackRetrievalResponse;
 import org.junit.Test;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 
@@ -13,22 +16,26 @@ public class TestChargebackRetrieval {
 
     @Test
     public void testChargebackByDate(){
-        ChargebackRetrievalResponse response = cbk.getChargebacksByDate("2018", "02", "15");
+        GregorianCalendar date = new GregorianCalendar();
+        date.set(2018, Calendar.JANUARY, 1);
+        ChargebackRetrievalResponse response = cbk.getChargebacksByDate(date);
         assertNotNull(response.getTransactionId());
         ChargebackApiCase case1 = response.getChargebackCases().get(0);
         assertNotNull(case1);
         assertNotNull(case1.getCaseId());
-        assertEquals("2018-02-15", CalendarPrinter.printDate(case1.getDateReceivedByVantivCnp()));
+        assertEquals("2018-01-01", CalendarPrinter.printDate(case1.getDateReceivedByVantivCnp()));
     }
 
     @Test
     public void testChargebackByFinancialImpact(){
-        ChargebackRetrievalResponse response = cbk.getChargebacksByFinancialImpact("2018", "02", "15", true);
+        GregorianCalendar date = new GregorianCalendar();
+        date.set(2018, Calendar.JANUARY, 1);
+        ChargebackRetrievalResponse response = cbk.getChargebacksByFinancialImpact(date, true);
         assertNotNull(response.getTransactionId());
         ChargebackApiCase case1 = response.getChargebackCases().get(0);
         assertNotNull(case1);
         assertNotNull(case1.getCaseId());
-        assertEquals("2018-02-15", CalendarPrinter.printDate(case1.getDateReceivedByVantivCnp()));
+        assertEquals("2018-01-01", CalendarPrinter.printDate(case1.getDateReceivedByVantivCnp()));
     }
 
     @Test
@@ -61,7 +68,9 @@ public class TestChargebackRetrieval {
 
     @Test
     public void testActivityByCardNum(){
-        ChargebackRetrievalResponse response = cbk.getActivityByCardNum("1111000011110000", "20", "03");
+        GregorianCalendar expDate = new GregorianCalendar();
+        expDate.set(2018, Calendar.JANUARY, 1);
+        ChargebackRetrievalResponse response = cbk.getActivityByCardNum("1111000011110000", expDate);
         assertNotNull(response.getTransactionId());
         ChargebackApiCase case1 = response.getChargebackCases().get(0);
         assertNotNull(case1);

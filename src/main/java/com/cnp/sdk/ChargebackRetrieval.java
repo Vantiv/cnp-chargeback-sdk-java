@@ -5,6 +5,10 @@ import com.cnp.sdk.generate.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Properties;
 
 /**
@@ -79,14 +83,12 @@ public class ChargebackRetrieval {
     ////////////////////////////////////////////////////////////////////
 
 
-    public ChargebackRetrievalResponse getChargebacksByDate(String yyyy, String mm, String dd) {
-        String date = yyyy+"-"+mm+"-"+dd;
-        return getRetrievalReposnse("date", date);
+    public ChargebackRetrievalResponse getChargebacksByDate(Calendar date) {
+        return getRetrievalReposnse("date", CalendarPrinter.printDate(date));
     }
 
-    public ChargebackRetrievalResponse getChargebacksByFinancialImpact(String yyyy, String mm, String dd, Boolean impact){
-        String date = yyyy+"-"+mm+"-"+dd;
-        return getRetrievalReposnse("date", date, "financialOnly", impact.toString());
+    public ChargebackRetrievalResponse getChargebacksByFinancialImpact(Calendar date, Boolean impact){
+        return getRetrievalReposnse("date", CalendarPrinter.printDate(date), "financialOnly", impact.toString());
     }
 
     public ChargebackRetrievalResponse getActivityByActionable(Boolean actionable){
@@ -101,9 +103,8 @@ public class ChargebackRetrieval {
         return getRetrievalReposnse("token", token);
     }
 
-    public ChargebackRetrievalResponse getActivityByCardNum(String cardNum, String yy, String mm){
-        String expDate = mm+yy;
-        return getRetrievalReposnse("cardNumber", cardNum, "expirationDate", expDate);
+    public ChargebackRetrievalResponse getActivityByCardNum(String cardNum, Calendar expDate){
+        return getRetrievalReposnse("cardNumber", cardNum, "expirationDate", CalendarPrinter.printExpDate(expDate));
     }
 
     public ChargebackRetrievalResponse getActivityByARN(String arn){
