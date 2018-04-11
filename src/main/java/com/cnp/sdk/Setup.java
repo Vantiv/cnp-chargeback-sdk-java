@@ -28,7 +28,7 @@ public class Setup {
 		BufferedReader stdin = new BufferedReader
 				(new InputStreamReader(System.in));
 
-		System.out.println("Welcome to ChargebackRetrieval Java_SDK");
+		System.out.println("Welcome to Chargeback Java SDK");
 		System.out.print("Please input your presenter user name: ");
 		config.put("username", stdin.readLine());
 		System.out.print("Please input your presenter password: ");

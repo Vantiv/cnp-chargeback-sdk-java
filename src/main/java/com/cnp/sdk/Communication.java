@@ -142,7 +142,7 @@ public class Communication {
         put.setHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_VALUE);
         put.setHeader(ACCEPT_HEADER, CONTENT_TYPE_VALUE);
         put.setEntity(new StringEntity(xmlRequest, XML_ENCODING));
-        printToConsole("Request XML: ", xmlRequest, config);
+        printToConsole("\nRequest XML: \n", xmlRequest, config);
         return sendHttpRequestToCnp(put, config);
     }
 
@@ -192,7 +192,7 @@ public class Communication {
         try {
             HttpResponse response = httpClient.execute(baseRequest);
             xmlResponse = validateResponse(response);
-            printToConsole("Response XML: ", xmlResponse, config);
+            printToConsole("\nResponse XML: \n", xmlResponse, config);
         } catch (IOException e) {
             throw new ChargebackException(CONNECTION_EXCEPTION_MESSAGE, e);
         } finally {
