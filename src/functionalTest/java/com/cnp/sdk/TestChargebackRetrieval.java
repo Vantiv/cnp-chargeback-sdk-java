@@ -4,9 +4,6 @@ import com.cnp.sdk.generate.ChargebackApiCase;
 import com.cnp.sdk.generate.ChargebackRetrievalResponse;
 import org.junit.Test;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -26,8 +23,6 @@ public class TestChargebackRetrieval {
 
     @Test
     public void testChargebackByFinancialImpact(){
-        GregorianCalendar date = new GregorianCalendar();
-        date.set(2018, Calendar.JANUARY, 1);
         ChargebackRetrievalResponse response = cbk.getChargebacksByFinancialImpact("2018-01-01", true);
         assertNotNull(response.getTransactionId());
         ChargebackApiCase case1 = response.getChargebackCases().get(0);
@@ -66,8 +61,6 @@ public class TestChargebackRetrieval {
 
     @Test
     public void testActivityByCardNum(){
-        GregorianCalendar expDate = new GregorianCalendar();
-        expDate.set(2018, Calendar.JANUARY, 1);
         ChargebackRetrievalResponse response = cbk.getActivityByCardNum("1111000011110000", "01-18");
         assertNotNull(response.getTransactionId());
         ChargebackApiCase case1 = response.getChargebackCases().get(0);

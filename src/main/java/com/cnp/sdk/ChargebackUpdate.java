@@ -23,31 +23,8 @@ public class ChargebackUpdate {
     private String baseurl;
 
     public ChargebackUpdate() {
-
         communication = new Communication();
-        FileInputStream fileInputStream = null;
-
-        try {
-            config = new Properties();
-            fileInputStream = new FileInputStream((new Configuration()).location());
-            config.load(fileInputStream);
-        } catch (FileNotFoundException e) {
-            throw new ChargebackException("Configuration file not found." +
-                    " If you are not using the .chargeback_SDK_config.properties file," +
-                    " please use the " + ChargebackUpdate.class.getSimpleName() + "(Properties) constructor." +
-                    " If you are using .chargeback_SDK_config.properties, you can generate one using java -jar cnp-chargeback-sdk-java-x.xx.jar", e);
-        } catch (IOException e) {
-            throw new ChargebackException("Configuration file could not be loaded.  Check to see if the user running this has permission to access the file", e);
-        } finally {
-            if (fileInputStream != null){
-                try {
-                    fileInputStream.close();
-                } catch (IOException e) {
-                    throw new ChargebackException("Configuration FileInputStream could not be closed.", e);
-                }
-            }
-        }
-
+        config = (new Configuration()).getProperties();
         baseurl = config.getProperty("url");
     }
 
@@ -58,7 +35,6 @@ public class ChargebackUpdate {
      * Properties that *must* be set are:
      *
      * 	url (eg https://payments.litle.com/vap/communicator/online)
-     *	reportGroup (eg "Default Report Group")
      *	username
      *	merchantId
      *	password

@@ -22,31 +22,8 @@ public class ChargebackRetrieval {
     private String baseurl;
 
     public ChargebackRetrieval() {
-
         communication = new Communication();
-        FileInputStream fileInputStream = null;
-
-        try {
-            config = new Properties();
-            fileInputStream = new FileInputStream((new Configuration()).location());
-            config.load(fileInputStream);
-        } catch (FileNotFoundException e) {
-            throw new ChargebackException("Configuration file not found." +
-                    " If you are not using the .chargeback_SDK_config.properties file," +
-                    " please use the " + ChargebackRetrieval.class.getSimpleName() + "(Properties) constructor." +
-                    " If you are using .chargeback_SDK_config.properties, you can generate one using java -jar cnp-chargeback-sdk-java-x.xx.jar", e);
-        } catch (IOException e) {
-            throw new ChargebackException("Configuration file could not be loaded.  Check to see if the user running this has permission to access the file", e);
-        } finally {
-            if (fileInputStream != null){
-                try {
-                    fileInputStream.close();
-                } catch (IOException e) {
-                    throw new ChargebackException("Configuration FileInputStream could not be closed.", e);
-                }
-            }
-        }
-
+        config = (new Configuration()).getProperties();
         baseurl = config.getProperty("url");
     }
 
@@ -57,7 +34,6 @@ public class ChargebackRetrieval {
      * Properties that *must* be set are:
      *
      * 	url (eg https://payments.litle.com/vap/communicator/online)
-     *	reportGroup (eg "Default Report Group")
      *	username
      *	merchantId
      *	password
@@ -115,13 +91,13 @@ public class ChargebackRetrieval {
     ////////////////////////////////////////////////////////////////////
 
     private ChargebackRetrievalResponse getRetrievalResponse(String key, String value){
-        String urlSuffix = "?" + key + "=" + value;
+        String urlSuffix = "/?" + key + "=" + value;
         return sendRetrievalRequest(urlSuffix);
 
     }
 
     private ChargebackRetrievalResponse getRetrievalResponse(String key1, String value1, String key2, String value2){
-        String urlSuffix = "?" + key1 + "=" + value1 + "&" + key2 + "=" + value2;
+        String urlSuffix = "/?" + key1 + "=" + value1 + "&" + key2 + "=" + value2;
         return sendRetrievalRequest(urlSuffix);
 
     }
@@ -135,7 +111,7 @@ public class ChargebackRetrieval {
 
     private String buildUrl(Map<String, String> parameters){
         StringBuilder sb = new StringBuilder();
-        String prefix = "?";
+        String prefix = "/?";
         for (Map.Entry entry : parameters.entrySet()) {
             sb.append(prefix);
             prefix = "&";
