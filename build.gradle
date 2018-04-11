@@ -116,14 +116,14 @@ task testFunctional(type:Test, dependsOn: functionalTestClasses){
     reports.html.destination = "$buildDir/reports/tests/functional"
 }
 
-task testCertification(type:Test, dependsOn: certificationTestClasses){
-    check.dependsOn it
-    classpath = project.sourceSets.certificationTest.runtimeClasspath
-    mustRunAfter testFunctional
-    testClassesDir = file(project.sourceSets.certificationTest.output.classesDir)
-    reports.junitXml.destination = "$buildDir/test-results/certification"
-    reports.html.destination = "$buildDir/reports/tests/certification"
-}
+//task testCertification(type:Test, dependsOn: certificationTestClasses){
+//    check.dependsOn it
+//    classpath = project.sourceSets.certificationTest.runtimeClasspath
+//    mustRunAfter testFunctional
+//    testClassesDir = file(project.sourceSets.certificationTest.output.classesDir)
+//    reports.junitXml.destination = "$buildDir/test-results/certification"
+//    reports.html.destination = "$buildDir/reports/tests/certification"
+//}
 
 task copyJarToKit(type:Copy, dependsOn:[check,jar]){
     from "${DIST_DIR_15}/lib/cnp-sdk-for-java-${JAR_VERSION}.jar"

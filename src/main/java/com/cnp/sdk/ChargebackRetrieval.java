@@ -72,15 +72,15 @@ public class ChargebackRetrieval {
     }
 
     public ChargebackRetrievalResponse getActivityByCaseId(Long caseId) {
-        return sendRetrievalRequest(String.valueOf(caseId));
+        return sendRetrievalRequest("/" + String.valueOf(caseId));
     }
 
     public ChargebackRetrievalResponse getActivityByToken(String token){
         return getRetrievalResponse("token", token);
     }
 
-    public ChargebackRetrievalResponse getActivityByCardNum(String cardNum, String mm_yy){
-        return getRetrievalResponse("cardNumber", cardNum, "expirationDate", mm_yy);
+    public ChargebackRetrievalResponse getActivityByCardNum(String cardNum, String mmyy){
+        return getRetrievalResponse("cardNumber", cardNum, "expirationDate", mmyy);
     }
 
     public ChargebackRetrievalResponse getActivityByARN(String arn){

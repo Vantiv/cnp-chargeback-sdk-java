@@ -57,7 +57,7 @@ public class Setup {
 				config.put("url", URL_MAP.get(lastUserInput.toLowerCase()));
 				badInput = false;
 			}
-			else if(lastUserInput.compareToIgnoreCase("other") == 0){
+			else if("other".equalsIgnoreCase(lastUserInput)){
 				// user wants to enter custom values
 				System.out.println("Please input the URL for online transactions (ex: https://www.testlitle.com/sandbox/communicator/online):");
 				config.put("url", stdin.readLine());

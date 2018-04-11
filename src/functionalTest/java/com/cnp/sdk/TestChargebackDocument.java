@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class TestChargebackDocument {
@@ -43,9 +42,9 @@ public class TestChargebackDocument {
 
     @Test
     public void testChargebackRetrieveDocument(){
-        assertNotNull(cbk);
         File documentToRetrieve = cbk.retrieveDocument(123000L, "logo.tiff", "test.tiff");
         assertTrue(documentToRetrieve.exists());
+        documentToRetrieve.delete();
     }
 
     @Test
@@ -56,8 +55,8 @@ public class TestChargebackDocument {
     }
 
     @Test
-    public void testChargebackDeleteDocument(){
-        ChargebackDocumentUploadResponse response = cbk.deleteDocument(123000L, "logo.tiff");
+    public void testChargebackRemoveDocument(){
+        ChargebackDocumentUploadResponse response = cbk.removeDocument(123000L, "logo.tiff");
         assertEquals("000", response.getResponseCode());
         assertEquals("Success", response.getResponseMessage());
     }

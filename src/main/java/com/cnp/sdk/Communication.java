@@ -101,6 +101,8 @@ public class Communication {
         HttpGet get = new HttpGet(requestUrl);
         prepareHttpRequest(get, config);
 
+        printToConsole("\nGET request to url: \n", requestUrl, config);
+
         try {
             HttpResponse response = httpClient.execute(get);
             validateDocumentResponse(response, filepath);
@@ -152,6 +154,7 @@ public class Communication {
 
     public String httpGetDocumentListRequest(String requestUrl, Properties config) {
         HttpGet get = new HttpGet(requestUrl);
+        printToConsole("\nGET request to url: \n", requestUrl, config);
         return sendHttpRequestToCnp(get, config);
     }
 
@@ -159,6 +162,8 @@ public class Communication {
         HttpPost post = new HttpPost(requestUrl);
         post.setHeader(CONTENT_TYPE_HEADER, getFileContentType(file));
         post.setEntity(new FileEntity(file));
+        printToConsole("\nPOST request to url: \n", requestUrl, config);
+        printToConsole("\nEntity: \n", file.getName(), config);
         return sendHttpRequestToCnp(post, config);
     }
 
@@ -166,11 +171,14 @@ public class Communication {
         HttpPut put = new HttpPut(requestUrl);
         put.setHeader(CONTENT_TYPE_HEADER, getFileContentType(file));
         put.setEntity(new FileEntity(file));
+        printToConsole("\nPUT request to url: \n", requestUrl, config);
+        printToConsole("\nEntity: \n", file.getName(), config);
         return sendHttpRequestToCnp(put, config);
     }
 
     public String httpDeleteDocumentRequest(String requestUrl, Properties config) {
         HttpDelete delete = new HttpDelete(requestUrl);
+        printToConsole("\nDELETE request to url: \n", requestUrl, config);
         return sendHttpRequestToCnp(delete, config);
     }
 
@@ -178,6 +186,7 @@ public class Communication {
         HttpGet get = new HttpGet(requestUrl);
         get.setHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_VALUE);
         get.setHeader(ACCEPT_HEADER, CONTENT_TYPE_VALUE);
+        printToConsole("\nGET request to url: \n", requestUrl, config);
         return sendHttpRequestToCnp(get, config);
     }
 
@@ -186,6 +195,7 @@ public class Communication {
         put.setHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_VALUE);
         put.setHeader(ACCEPT_HEADER, CONTENT_TYPE_VALUE);
         put.setEntity(new StringEntity(xmlRequest, XML_ENCODING));
+        printToConsole("\nPUT request to url: \n", requestUrl, config);
         printToConsole("\nRequest XML: \n", xmlRequest, config);
         return sendHttpRequestToCnp(put, config);
     }

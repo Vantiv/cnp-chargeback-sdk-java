@@ -60,27 +60,29 @@ public class ChargebackDocument {
 
 
     public ChargebackDocumentUploadResponse uploadDocument(Long caseId, File document){
-        String requestUrl = baseUrl + "upload/" + caseId + "/" + document.getName();
+        String requestUrl = baseUrl + "/upload/" + caseId + "/" + document.getName();
         return communication.postDocumentRequest(document, requestUrl, config);
     }
 
     public File retrieveDocument(Long caseId, String documentId, String filepath){
-        String requestUrl = baseUrl + "retrieve/" + caseId + "/" + documentId;
+        String requestUrl = baseUrl + "/retrieve/" + caseId + "/" + documentId;
         return communication.httpGetDocumentRequest(filepath, requestUrl, config);
     }
 
     public ChargebackDocumentUploadResponse replaceDocument(Long caseId, File document){
-        String requestUrl = baseUrl + "replace/" + caseId + "/" + document.getName();
+        String requestUrl = baseUrl + "/replace/" + caseId + "/" + document.getName();
         return communication.putDocumentRequest(document, requestUrl, config);
     }
 
-    public ChargebackDocumentUploadResponse deleteDocument(Long caseId, String documentId){
-        String requestUrl = baseUrl + "remove/" + caseId + "/" + documentId;
+    public ChargebackDocumentUploadResponse removeDocument(Long caseId, String documentId){
+        String requestUrl = baseUrl + "/remove/" + caseId + "/" + documentId;
+        System.out.println(requestUrl);
         return communication.deleteDocumentRequest(requestUrl, config);
     }
 
     public ChargebackDocumentUploadResponse listDocuments(Long caseId){
-        String requestUrl = baseUrl + "list/" + caseId;
+        String requestUrl = baseUrl + "/list/" + caseId;
+        System.out.println(requestUrl);
         return communication.getDocumentListRequest(requestUrl, config);
     }
 

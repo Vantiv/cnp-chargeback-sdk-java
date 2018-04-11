@@ -2,8 +2,8 @@ package com.cnp.sdk;
 
 import com.cnp.sdk.generate.ChargebackUpdateResponse;
 import org.junit.Test;
-
 import static org.junit.Assert.assertNotNull;
+
 
 public class TestChargebackUpdate {
 
