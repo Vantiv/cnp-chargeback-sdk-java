@@ -133,13 +133,7 @@ public class ChargebackUpdate {
 
     private ChargebackUpdateResponse getUpdateResponse(Long caseId, ChargebackUpdateRequest request){
         String xmlRequest = XMLConverter.generateUpdateRequest(request);
-        String response = sendUpdateRequest(caseId, xmlRequest);
-        return XMLConverter.generateUpdateResponse(response);
-    }
-
-    private String sendUpdateRequest(Long caseId, String xmlRequest){
         String requestUrl = baseurl + caseId;
-        return communication.httpPutRequest(xmlRequest, requestUrl, config);
+        return communication.putUpdateRequest(xmlRequest, requestUrl, config);
     }
-
 }

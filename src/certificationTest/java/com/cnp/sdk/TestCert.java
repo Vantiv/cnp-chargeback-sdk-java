@@ -29,7 +29,7 @@ public class TestCert {
 
     @Test
     public void test1(){
-        ChargebackRetrievalResponse response = cbkRetrieval.getChargebacksByDate("2013", "01", "01");
+        ChargebackRetrievalResponse response = cbkRetrieval.getChargebacksByDate("2013-01-01");
         List<ChargebackApiCase> cases = response.getChargebackCases();
 
         Collections.sort(cases, new Comparator<ChargebackApiCase>() {

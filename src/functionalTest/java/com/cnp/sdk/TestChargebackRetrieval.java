@@ -16,9 +16,7 @@ public class TestChargebackRetrieval {
 
     @Test
     public void testChargebackByDate(){
-        GregorianCalendar date = new GregorianCalendar();
-        date.set(2018, Calendar.JANUARY, 1);
-        ChargebackRetrievalResponse response = cbk.getChargebacksByDate(date);
+        ChargebackRetrievalResponse response = cbk.getChargebacksByDate("2018-01-01");
         assertNotNull(response.getTransactionId());
         ChargebackApiCase case1 = response.getChargebackCases().get(0);
         assertNotNull(case1);
@@ -30,7 +28,7 @@ public class TestChargebackRetrieval {
     public void testChargebackByFinancialImpact(){
         GregorianCalendar date = new GregorianCalendar();
         date.set(2018, Calendar.JANUARY, 1);
-        ChargebackRetrievalResponse response = cbk.getChargebacksByFinancialImpact(date, true);
+        ChargebackRetrievalResponse response = cbk.getChargebacksByFinancialImpact("2018-01-01", true);
         assertNotNull(response.getTransactionId());
         ChargebackApiCase case1 = response.getChargebackCases().get(0);
         assertNotNull(case1);
@@ -70,7 +68,7 @@ public class TestChargebackRetrieval {
     public void testActivityByCardNum(){
         GregorianCalendar expDate = new GregorianCalendar();
         expDate.set(2018, Calendar.JANUARY, 1);
-        ChargebackRetrievalResponse response = cbk.getActivityByCardNum("1111000011110000", expDate);
+        ChargebackRetrievalResponse response = cbk.getActivityByCardNum("1111000011110000", "01-18");
         assertNotNull(response.getTransactionId());
         ChargebackApiCase case1 = response.getChargebackCases().get(0);
         assertNotNull(case1);

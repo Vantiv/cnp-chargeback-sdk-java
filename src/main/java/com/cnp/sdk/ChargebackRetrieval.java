@@ -5,11 +5,7 @@ import com.cnp.sdk.generate.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * ChargebackRetrieval object has methods for performing the different ChargebackRetrieval functionalities supported by the Vantiv API
@@ -83,61 +79,73 @@ public class ChargebackRetrieval {
     }
 
     ////////////////////////////////////////////////////////////////////
-    //                    ChargebackRetrieval API:                       //
+    //                    ChargebackRetrieval API:                    //
     ////////////////////////////////////////////////////////////////////
 
 
-    public ChargebackRetrievalResponse getChargebacksByDate(Calendar date) {
-        return getRetrievalReposnse("date", CalendarPrinter.printDate(date));
+    public ChargebackRetrievalResponse getChargebacksByDate(String yyyy_mm_dd) {
+        return getRetrievalResponse("date", yyyy_mm_dd);
     }
 
-    public ChargebackRetrievalResponse getChargebacksByFinancialImpact(Calendar date, Boolean impact){
-        return getRetrievalReposnse("date", CalendarPrinter.printDate(date), "financialOnly", impact.toString());
+    public ChargebackRetrievalResponse getChargebacksByFinancialImpact(String yyyy_mm_dd, Boolean impact){
+        return getRetrievalResponse("date", yyyy_mm_dd, "financialOnly", impact.toString());
     }
 
     public ChargebackRetrievalResponse getActivityByActionable(Boolean actionable){
-        return getRetrievalReposnse("actionable", actionable.toString());
+        return getRetrievalResponse("actionable", actionable.toString());
     }
 
     public ChargebackRetrievalResponse getActivityByCaseId(Long caseId) {
-        return getRetrievalReposnse(caseId);
+        return sendRetrievalRequest(String.valueOf(caseId));
     }
 
     public ChargebackRetrievalResponse getActivityByToken(String token){
-        return getRetrievalReposnse("token", token);
+        return getRetrievalResponse("token", token);
     }
 
-    public ChargebackRetrievalResponse getActivityByCardNum(String cardNum, Calendar expDate){
-        return getRetrievalReposnse("cardNumber", cardNum, "expirationDate", CalendarPrinter.printExpDate(expDate));
+    public ChargebackRetrievalResponse getActivityByCardNum(String cardNum, String mm_yy){
+        return getRetrievalResponse("cardNumber", cardNum, "expirationDate", mm_yy);
     }
 
     public ChargebackRetrievalResponse getActivityByARN(String arn){
-        return getRetrievalReposnse("arn", arn);
+        return getRetrievalResponse("arn", arn);
     }
 
 
     ////////////////////////////////////////////////////////////////////
 
-    private ChargebackRetrievalResponse getRetrievalReposnse(String key, String value){
+    private ChargebackRetrievalResponse getRetrievalResponse(String key, String value){
         String urlSuffix = "?" + key + "=" + value;
-        String response = sendRetrievalRequest(urlSuffix);
-        return XMLConverter.generateRetrievalResponse(response);
+        return sendRetrievalRequest(urlSuffix);
+
     }
 
-    private ChargebackRetrievalResponse getRetrievalReposnse(String key1, String value1, String key2, String value2){
+    private ChargebackRetrievalResponse getRetrievalResponse(String key1, String value1, String key2, String value2){
         String urlSuffix = "?" + key1 + "=" + value1 + "&" + key2 + "=" + value2;
-        String response = sendRetrievalRequest(urlSuffix);
-        return XMLConverter.generateRetrievalResponse(response);
+        return sendRetrievalRequest(urlSuffix);
+
     }
 
-    private ChargebackRetrievalResponse getRetrievalReposnse(Long caseId){
-        String response = sendRetrievalRequest(String.valueOf(caseId));
-        return XMLConverter.generateRetrievalResponse(response);
+    // Use if there are a lot of parameters
+
+    private ChargebackRetrievalResponse getRetrievalResponse(Map<String, String> parameters){
+        String urlSuffix = buildUrl(parameters);
+        return sendRetrievalRequest(urlSuffix);
     }
 
-    private String sendRetrievalRequest(String urlSuffix){
+    private String buildUrl(Map<String, String> parameters){
+        StringBuilder sb = new StringBuilder();
+        String prefix = "?";
+        for (Map.Entry entry : parameters.entrySet()) {
+            sb.append(prefix);
+            prefix = "&";
+            sb.append(entry.getKey()).append("=").append(entry.getValue());
+        }
+        return sb.toString();
+    }
+
+    private ChargebackRetrievalResponse sendRetrievalRequest(String urlSuffix){
         String requestUrl = baseurl + urlSuffix;
-        System.out.println(requestUrl);
-        return communication.httpGetRequest(requestUrl, config);
+        return communication.getRetrievalRequest(requestUrl, config);
     }
 }

@@ -10,6 +10,8 @@ import javax.activation.MimetypesFileTypeMap;
 import javax.net.ssl.SSLContext;
 
 import com.cnp.sdk.generate.ChargebackDocumentUploadResponse;
+import com.cnp.sdk.generate.ChargebackRetrievalResponse;
+import com.cnp.sdk.generate.ChargebackUpdateResponse;
 import org.apache.http.*;
 import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.config.RequestConfig;
@@ -111,6 +113,48 @@ public class Communication {
         return document;
     }
 
+    ////////////////////////////////////////////////////////////////////
+    //                    Return response objects:                    //
+    ////////////////////////////////////////////////////////////////////
+
+    public ChargebackDocumentUploadResponse getDocumentListRequest(String requestUrl, Properties config) {
+        String response = httpGetDocumentListRequest(requestUrl, config);
+        return XMLConverter.generateDocumentResponse(response);
+    }
+
+    public ChargebackDocumentUploadResponse postDocumentRequest(File file, String requestUrl, Properties config) {
+        String response = httpPostDocumentRequest(file, requestUrl, config);
+        return XMLConverter.generateDocumentResponse(response);
+    }
+    public ChargebackDocumentUploadResponse putDocumentRequest(File file, String requestUrl, Properties config) {
+        String response = httpPutDocumentRequest(file, requestUrl, config);
+        return XMLConverter.generateDocumentResponse(response);
+    }
+
+    public ChargebackDocumentUploadResponse deleteDocumentRequest(String requestUrl, Properties config) {
+        String response = httpDeleteDocumentRequest(requestUrl, config);
+        return XMLConverter.generateDocumentResponse(response);
+    }
+
+    public ChargebackRetrievalResponse getRetrievalRequest(String requestUrl, Properties config) {
+        String response = httpGetRetrievalRequest(requestUrl, config);
+        return XMLConverter.generateRetrievalResponse(response);
+    }
+
+    public ChargebackUpdateResponse putUpdateRequest(String xmlRequest, String requestUrl, Properties config) {
+        String response = httpPutUpdateRequest(xmlRequest, requestUrl, config);
+        return XMLConverter.generateUpdateResponse(response);
+    }
+
+    ////////////////////////////////////////////////////////////////////
+    //                    Return xml string response:                 //
+    ////////////////////////////////////////////////////////////////////
+
+    public String httpGetDocumentListRequest(String requestUrl, Properties config) {
+        HttpGet get = new HttpGet(requestUrl);
+        return sendHttpRequestToCnp(get, config);
+    }
+
     public String httpPostDocumentRequest(File file, String requestUrl, Properties config) {
         HttpPost post = new HttpPost(requestUrl);
         post.setHeader(CONTENT_TYPE_HEADER, getFileContentType(file));
@@ -130,14 +174,14 @@ public class Communication {
         return sendHttpRequestToCnp(delete, config);
     }
 
-    public String httpGetRequest(String requestUrl, Properties config) {
+    public String httpGetRetrievalRequest(String requestUrl, Properties config) {
         HttpGet get = new HttpGet(requestUrl);
         get.setHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_VALUE);
         get.setHeader(ACCEPT_HEADER, CONTENT_TYPE_VALUE);
         return sendHttpRequestToCnp(get, config);
     }
 
-    public String httpPutRequest(String xmlRequest, String requestUrl, Properties config) {
+    public String httpPutUpdateRequest(String xmlRequest, String requestUrl, Properties config) {
         HttpPut put = new HttpPut(requestUrl);
         put.setHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_VALUE);
         put.setHeader(ACCEPT_HEADER, CONTENT_TYPE_VALUE);
@@ -152,15 +196,24 @@ public class Communication {
      *  Method to send given HttpRequest to server, after preparing it. Returns response from server
      */
     public String sendHttpRequestToCnp(HttpRequestBase baseRequest, Properties config){
-        String xmlResponse;
-        prepareHttpRequest(baseRequest, config);
-
-        try {
-            xmlResponse = execHttpRequest(baseRequest, config);
-        } catch (Exception e) {
-            throw e;
-        }
+        HttpResponse response = execHttpRequest(baseRequest, config);
+        String xmlResponse = validateResponse(response);
+        printToConsole("\nResponse XML: \n", xmlResponse, config);
         return xmlResponse;
+    }
+
+    /**
+     *  Method to execute HttpRequest: given http request is sent, and receieved response is returned after validation
+     */
+    public HttpResponse execHttpRequest(HttpRequestBase baseRequest, Properties config){
+        prepareHttpRequest(baseRequest, config);
+        try {
+            return httpClient.execute(baseRequest);
+        } catch (IOException e) {
+            throw new ChargebackException(CONNECTION_EXCEPTION_MESSAGE, e);
+        } finally {
+            baseRequest.abort();
+        }
     }
 
     /**
@@ -182,23 +235,6 @@ public class Communication {
         }
 
         baseRequest.setConfig(requestConfig);
-    }
-
-    /**
-     *  Method to executes HttpRequest: given http request is sent, and receieved response is returned after validation
-     */
-    public String execHttpRequest(HttpRequestBase baseRequest, Properties config){
-        String xmlResponse;
-        try {
-            HttpResponse response = httpClient.execute(baseRequest);
-            xmlResponse = validateResponse(response);
-            printToConsole("\nResponse XML: \n", xmlResponse, config);
-        } catch (IOException e) {
-            throw new ChargebackException(CONNECTION_EXCEPTION_MESSAGE, e);
-        } finally {
-            baseRequest.abort();
-        }
-        return xmlResponse;
     }
 
     /**

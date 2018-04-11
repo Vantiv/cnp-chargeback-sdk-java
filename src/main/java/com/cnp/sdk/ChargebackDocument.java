@@ -85,8 +85,7 @@ public class ChargebackDocument {
 
     public ChargebackDocumentUploadResponse uploadDocument(Long caseId, File document){
         String requestUrl = baseUrl + "upload/" + caseId + "/" + document.getName();
-        String xml = communication.httpPostDocumentRequest(document, requestUrl, config);
-        return XMLConverter.generateDocumentResponse(xml);
+        return communication.postDocumentRequest(document, requestUrl, config);
     }
 
     public File retrieveDocument(Long caseId, String documentId, String filepath){
@@ -96,21 +95,17 @@ public class ChargebackDocument {
 
     public ChargebackDocumentUploadResponse replaceDocument(Long caseId, File document){
         String requestUrl = baseUrl + "replace/" + caseId + "/" + document.getName();
-        String xml = communication.httpPutDocumentRequest(document, requestUrl, config);
-        return XMLConverter.generateDocumentResponse(xml);
+        return communication.putDocumentRequest(document, requestUrl, config);
     }
 
     public ChargebackDocumentUploadResponse deleteDocument(Long caseId, String documentId){
         String requestUrl = baseUrl + "remove/" + caseId + "/" + documentId;
-        String xml = communication.httpDeleteDocumentRequest(requestUrl, config);
-        return XMLConverter.generateDocumentResponse(xml);
+        return communication.deleteDocumentRequest(requestUrl, config);
     }
 
     public ChargebackDocumentUploadResponse listDocuments(Long caseId){
         String requestUrl = baseUrl + "list/" + caseId;
-        String xml = communication.httpGetRequest(requestUrl, config);
-        return XMLConverter.generateDocumentResponse(xml);
+        return communication.getDocumentListRequest(requestUrl, config);
     }
-    
 
 }
