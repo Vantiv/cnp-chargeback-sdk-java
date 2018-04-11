@@ -137,6 +137,7 @@ public class ChargebackRetrieval {
 
     private String sendRetrievalRequest(String urlSuffix){
         String requestUrl = baseurl + urlSuffix;
+        System.out.println(requestUrl);
         return communication.httpGetRequest(requestUrl, config);
     }
 }

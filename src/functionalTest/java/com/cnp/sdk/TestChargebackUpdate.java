@@ -3,7 +3,7 @@ package com.cnp.sdk;
 import com.cnp.sdk.generate.ChargebackUpdateResponse;
 import org.junit.Test;
 
-import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertNotNull;
 
 public class TestChargebackUpdate {
 

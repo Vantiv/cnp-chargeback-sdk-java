@@ -75,6 +75,10 @@ public class ChargebackUpdate {
         baseurl = config.getProperty("url");
     }
 
+    public void setCommunication(Communication communication) {
+        this.communication = communication;
+    }
+
     ////////////////////////////////////////////////////////////////////
     //                    ChargebackUpdate API:                       //
     ////////////////////////////////////////////////////////////////////

@@ -74,6 +74,10 @@ public class ChargebackDocument {
         baseUrl = config.getProperty("url");
     }
 
+    public void setCommunication(Communication communication) {
+        this.communication = communication;
+    }
+
     ////////////////////////////////////////////////////////////////////
     //                    ChargebackDocument API:                       //
     ////////////////////////////////////////////////////////////////////
