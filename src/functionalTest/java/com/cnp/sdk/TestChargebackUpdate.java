@@ -1,6 +1,5 @@
 package com.cnp.sdk;
 
-import com.cnp.sdk.generate.ChargebackRetrievalResponse;
 import com.cnp.sdk.generate.ChargebackUpdateResponse;
 import org.junit.Test;
 
@@ -51,11 +50,5 @@ public class TestChargebackUpdate {
         } catch (ChargebackException e){
             assertEquals("404 : Not Found - Could not find requested object.", e.getMessage());
         }
-    }
-
-    @Test
-    public void testErrorResponse1(){
-        ChargebackUpdateResponse response = cbk.addNoteToCase(404L, "ErrorResponse");
-
     }
 }

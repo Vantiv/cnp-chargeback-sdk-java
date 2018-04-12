@@ -82,7 +82,7 @@ public class TestChargebackDocument {
             File documentToRetrieve = cbk.retrieveDocument(123002L, "logo.tiff", "test.tiff");
             fail("Expected Exception");
         } catch (ChargebackException e){
-            assertEquals("404 : Not Found - Could not find requested object.", e.getMessage());
+            assertEquals("Could not find requested object.", e.getMessage());
         }
     }
 
