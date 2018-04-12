@@ -1,9 +1,7 @@
 package com.cnp.sdk;
 
-import com.cnp.sdk.generate.ChargebackDocumentUploadResponse;
-import com.cnp.sdk.generate.ChargebackRetrievalResponse;
-import com.cnp.sdk.generate.ChargebackUpdateRequest;
-import com.cnp.sdk.generate.ChargebackUpdateResponse;
+import com.cnp.sdk.generate.*;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -50,5 +48,15 @@ public class XMLConverter {
             throw new ChargebackException("Error validating xml data against the schema", e);
         }
         return sw.toString();
+    }
+
+    public static ErrorResponse generateErrorResponse(String xmlResponse){
+        ErrorResponse response;
+        try {
+            response = (ErrorResponse) CnpContext.getJAXBContext().createUnmarshaller().unmarshal(new StringReader(xmlResponse));
+        } catch (JAXBException e) {
+            throw new ChargebackException("Error validating xml data against the schema", e);
+        }
+        return response;
     }
 }

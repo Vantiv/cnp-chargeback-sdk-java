@@ -20,7 +20,7 @@ public class TestCert {
         Properties config = new Properties();
         FileInputStream fileInputStream = new FileInputStream((new Configuration()).location());
         config.load(fileInputStream);
-        config.setProperty("url", "https://prelive.litle.com/");
+        config.setProperty("url", "https://prelive.litle.com/vap/services/chargebacks/");
         config.setProperty("proxyHost", "");
         config.setProperty("proxyPort", "");
         cbkRetrieval = new ChargebackRetrieval(config);
@@ -213,14 +213,12 @@ public class TestCert {
         assertEquals("Cert test10", activity.getNotes());
     }
 
-    @Test
     private void testChargebackCase(ChargebackApiCase cbkcase, String arn, String cbkflow, String casecycle){
         assertEquals(arn, cbkcase.getAcquirerReferenceNumber());
 //        assertEquals(cbkflow, cbkcase.get());
         assertEquals(casecycle, cbkcase.getCycle());
     }
 
-    @Test
     private Long getCaseIdForArn(String arn){
         ChargebackRetrievalResponse retrievalResponse = cbkRetrieval.getActivityByARN(arn);
         return retrievalResponse.getChargebackCases().get(0).getCaseId();

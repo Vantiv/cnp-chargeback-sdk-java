@@ -73,6 +73,7 @@ public class TestXMLConverter {
                 "</chargebackDocumentUploadResponse>\n";
         ChargebackDocumentUploadResponse response = XMLConverter.generateDocumentResponse(xmlResponse);
         assertNotNull(response);
+        assertEquals("009", response.getResponseCode());
     }
 
     @Test
@@ -85,5 +86,18 @@ public class TestXMLConverter {
         String requestStr = XMLConverter.generateUpdateRequest(request);
         assertNotNull(request);
         assertEquals(expectedStr, requestStr);
+    }
+
+    @Test
+    public void testGenerateErrorResponse(){
+        String xmlResponse = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                "<errorResponse xmlns=\"http://www.vantivcnp.com/chargebacks\">\n" +
+                "  <errors>\n" +
+                "    <error>Could not find requested object.</error>\n" +
+                "  </errors>\n" +
+                "</errorResponse>";
+        ErrorResponse response = XMLConverter.generateErrorResponse(xmlResponse);
+        assertNotNull(response);
+        assertEquals("Could not find requested object.", response.getErrors().getErrors().get(0));
     }
 }

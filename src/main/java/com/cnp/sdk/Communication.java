@@ -12,6 +12,7 @@ import javax.net.ssl.SSLContext;
 import com.cnp.sdk.generate.ChargebackDocumentUploadResponse;
 import com.cnp.sdk.generate.ChargebackRetrievalResponse;
 import com.cnp.sdk.generate.ChargebackUpdateResponse;
+import com.cnp.sdk.generate.ErrorResponse;
 import org.apache.http.*;
 import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.config.RequestConfig;
@@ -274,9 +275,11 @@ public class Communication {
         try{
             entity = response.getEntity();
             if (response.getStatusLine().getStatusCode() != 200) {
-                System.out.println("\n" + EntityUtils.toString(entity,XML_ENCODING));
+                xmlResponse = EntityUtils.toString(entity, XML_ENCODING);
+                System.out.println("\n" + xmlResponse);
+                ErrorResponse errorResponse = XMLConverter.generateErrorResponse(xmlResponse);
                 throw new ChargebackException(response.getStatusLine().getStatusCode() + " : " +
-                        response.getStatusLine().getReasonPhrase());
+                        response.getStatusLine().getReasonPhrase() + " - " + getErrorMessage(errorResponse));
             }
             xmlResponse = EntityUtils.toString(entity,XML_ENCODING);
         }
@@ -308,8 +311,8 @@ public class Communication {
             if(!"image/tiff".equals(entity.getContentType().getValue())){
                 String xmlResponse = EntityUtils.toString(entity, XML_ENCODING);
                 System.out.println("\n" + xmlResponse);
-                ChargebackDocumentUploadResponse responseObj = XMLConverter.generateDocumentResponse(xmlResponse);
-                throw new ChargebackException(responseObj.getResponseCode() + ":" + responseObj.getResponseMessage());
+                ErrorResponse errorResponse = XMLConverter.generateErrorResponse(xmlResponse);
+                throw new ChargebackException(getErrorMessage(errorResponse));
             }
 
             InputStream is = entity.getContent();
@@ -357,5 +360,9 @@ public class Communication {
         xml = xml.replaceAll("<track>.*</track>", "<track>" + NEUTER_STR + "</track>");
         xml = xml.replaceAll("<number>.*</number>", "<number>" + NEUTER_STR + "</number>");
         return xml;
+    }
+
+    private String getErrorMessage(ErrorResponse errorResponse){
+        return errorResponse.getErrors().getErrors().get(0);
     }
 }

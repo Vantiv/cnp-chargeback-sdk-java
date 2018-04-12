@@ -1,6 +1,7 @@
 package com.cnp.sdk;
 
 import com.cnp.sdk.generate.ChargebackDocumentUploadResponse;
+import com.cnp.sdk.generate.ChargebackUpdateResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +13,7 @@ import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class TestChargebackDocument {
 
@@ -68,6 +70,20 @@ public class TestChargebackDocument {
         assertTrue(response.getDocumentIds().contains("doc.tiff"));
         assertEquals("000", response.getResponseCode());
         assertEquals("Success", response.getResponseMessage());
+    }
+
+    @Test
+    public void testErrorResponse(){
+        ChargebackDocumentUploadResponse response = cbk.uploadDocument(123001L, documentToUpload);
+        assertEquals("001", response.getResponseCode());
+        assertEquals("Invalid Merchant", response.getResponseMessage());
+
+        try{
+            File documentToRetrieve = cbk.retrieveDocument(123002L, "logo.tiff", "test.tiff");
+            fail("Expected Exception");
+        } catch (ChargebackException e){
+            assertEquals("404 : Not Found - Could not find requested object.", e.getMessage());
+        }
     }
 
     @After

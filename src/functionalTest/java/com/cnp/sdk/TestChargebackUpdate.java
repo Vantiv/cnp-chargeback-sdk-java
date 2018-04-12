@@ -1,8 +1,12 @@
 package com.cnp.sdk;
 
+import com.cnp.sdk.generate.ChargebackRetrievalResponse;
 import com.cnp.sdk.generate.ChargebackUpdateResponse;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 
 public class TestChargebackUpdate {
@@ -37,5 +41,21 @@ public class TestChargebackUpdate {
     public void testChargebackRespondToUpdateRequest(){
         ChargebackUpdateResponse response = cbk.respondToRetrievalRequest(123L, "Test responded to Update request");
         assertNotNull(response.getTransactionId());
+    }
+
+    @Test
+    public void testErrorResponse(){
+        try{
+            ChargebackUpdateResponse response = cbk.addNoteToCase(404L, "ErrorResponse");
+            fail("Expected Exception");
+        } catch (ChargebackException e){
+            assertEquals("404 : Not Found - Could not find requested object.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testErrorResponse1(){
+        ChargebackUpdateResponse response = cbk.addNoteToCase(404L, "ErrorResponse");
+
     }
 }
