@@ -76,13 +76,11 @@ public class ChargebackDocument {
 
     public ChargebackDocumentUploadResponse removeDocument(Long caseId, String documentId){
         String requestUrl = baseUrl + "/remove/" + caseId + "/" + documentId;
-        System.out.println(requestUrl);
         return communication.httpDeleteDocumentRequest(requestUrl, config);
     }
 
     public ChargebackDocumentUploadResponse listDocuments(Long caseId){
         String requestUrl = baseUrl + "/list/" + caseId;
-        System.out.println(requestUrl);
         return communication.httpGetDocumentListRequest(requestUrl, config);
     }
 
