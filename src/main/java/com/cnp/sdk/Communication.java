@@ -337,7 +337,7 @@ public class Communication {
      *  Method to print xml to console: a prefixMessage is appended to given xml before printing to console
      */
     private void printToConsole(String prefixMessage, String xml, Properties config){
-        boolean printxml = "true".equalsIgnoreCase(config.getProperty("printxml"));
+        boolean printxml = "true".equalsIgnoreCase(config.getProperty("printXml"));
         boolean neuterXml = "true".equalsIgnoreCase(config.getProperty("neuterXml"));
         if (printxml) {
             if (neuterXml) {

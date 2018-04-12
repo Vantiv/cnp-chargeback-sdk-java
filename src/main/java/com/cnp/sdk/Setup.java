@@ -81,8 +81,8 @@ public class Setup {
         lastUserInput = stdin.readLine();
         config.put("timeout", (lastUserInput == null ? "" : "10000"));
 
-		config.put("printxml", "false");
-		config.put("neuterxml", "false");
+		config.put("printXml", "false");
+		config.put("neuterXml", "false");
 
 		config.store(configFile, "");
 		System.out.println("The chargeback configuration file has been generated, the file is located at " + file.getAbsolutePath());
