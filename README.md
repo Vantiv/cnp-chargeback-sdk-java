@@ -47,16 +47,30 @@ Setup
 4. Use it:
 
 ```java
-ChargebackRetrieval cbkRetrieval = new ChargebackRetrieval();
-ChargebackRetrievalResponse response = cbkRetrieval.getActivityByARN("000000000");
 
-ChargebackApiCase case1 = response.getChargebackCases().get(0);
-Long caseId = case1.getCaseId();
+import com.cnp.sdk.*;
+import com.cnp.sdk.generated.*;
+public class ChargebackSample {
 
-ChargebackUpdate cbkUpdate = new ChargebackUpdate();
-ChargebackUpdateResponse response = cbkUpdate.addNoteToCase(123L, "Sample chargeback");
 
-ChargebackDocument cbkDocument = new ChargebackDocument();
-File documentToUpload = new File("invoice.pdf");
-ChargebackDocumentUploadResponse = cbkDocument.uploadDocument(caseId, documentToUpload);
+	public static void main(String[] args) {
+
+		// Get chargeback case by Acquirer Reference Number
+		ChargebackRetrieval cbkRetrieval = new ChargebackRetrieval();
+		ChargebackRetrievalResponse response = cbkRetrieval.getActivityByARN("000000000");
+
+		ChargebackApiCase case1 = response.getChargebackCases().get(0);
+		Long caseId = case1.getCaseId();
+
+		// Add note to chargeback case
+		ChargebackUpdate cbkUpdate = new ChargebackUpdate();
+		ChargebackUpdateResponse response = cbkUpdate.addNoteToCase(123L, "Sample chargeback");
+
+		// Uplaod supporting document to chargeback case
+		ChargebackDocument cbkDocument = new ChargebackDocument();
+		File documentToUpload = new File("invoice.pdf");
+		ChargebackDocumentUploadResponse = cbkDocument.uploadDocument(caseId, documentToUpload);
+		
+	}
+}
 ```
