@@ -11,14 +11,39 @@ import java.util.Properties;
 
 public class Setup {
 
-	private static final Map<String,String> URL_MAP = new HashMap<String,String>() {
-		{
-			put("sandbox","http://www.testvantivcnp.com/sandbox/new/services/chargebacks/");
-			put("prelive","https://payments.vantivprelive.com/vap/services/chargeback/");
-			put("postlive","https://payments.vantivpostlive.com/vap/services/chargeback/");
-			put("production","https://payments.vantivcnp.com/vap/services/chargeback/");
+	/* List of environments for the configuration. */
+	private enum EnvironmentConfiguration {
+		SANDBOX("sandbox", "https://www.testvantivcnp.com/sandbox/new/sandbox/services/chargebacks"),
+		PRELIVE("prelive", "https://payments.vantivprelive.com/vap/services/chargebacks"),
+		POSTLIVE("postlive", "https://payments.vantivpostlive.com/vap/services/chargebacks"),
+		PRODUCTION("production", "https://payments.vantivcnp.com/vap/services/chargebacks"),
+		OTHER("other", "You will be asked for all the values");
+
+		private final String key;
+		private final String url;
+
+		private EnvironmentConfiguration(final String key, final String online) {
+			this.key = key;
+			this.url = online;
 		}
-	};
+
+		public final String getKey() {
+			return this.key;
+		}
+
+		public final String getOnlineUrl() {
+			return this.url;
+		}
+
+		public static final EnvironmentConfiguration fromValue(final String value) {
+			for (final EnvironmentConfiguration environConfig : EnvironmentConfiguration.values()) {
+				if (environConfig.getKey().equals(value)) {
+					return environConfig;
+				}
+			}
+			return null;
+		}
+	}
 
 	public static void main(String[] args) throws IOException {
 		File file = (new Configuration()).location();
@@ -45,27 +70,24 @@ public class Setup {
 			if(badInput){
 				System.out.println("====== Invalid choice entered ======");
 			}
-
-			System.out.println("Please choose a url from the following list (example: 'prelive'):");
-			for (Map.Entry entry : URL_MAP.entrySet()) {
-				System.out.println("\t" + entry.getKey() + " => " + entry.getValue());
+			System.out.println("Please choose an environment from the following list (example: 'prelive'):");
+			for (final EnvironmentConfiguration environConfig : EnvironmentConfiguration.values()) {
+				System.out.println(String.format("\t%s => %s", environConfig.getKey(), environConfig.getOnlineUrl()));
 			}
-			System.out.println("\tother => You will be asked for all the values");
 			lastUserInput = stdin.readLine();
-			if(URL_MAP.containsKey(lastUserInput.toLowerCase())) {
-				// predefined value
-				config.put("url", URL_MAP.get(lastUserInput.toLowerCase()));
-				badInput = false;
-			}
-			else if("other".equalsIgnoreCase(lastUserInput)){
-				// user wants to enter custom values
-				System.out.println("Please input the URL for online transactions (ex: https://www.testlitle.com/sandbox/communicator/online):");
-				config.put("url", stdin.readLine());
-				badInput = false;
-			}
-			else{
+			EnvironmentConfiguration environSelected = EnvironmentConfiguration.fromValue(lastUserInput);
+			if (environSelected == null) {
 				// error condition
 				badInput = true;
+			} else if (EnvironmentConfiguration.OTHER.equals(environSelected)) {
+				// user wants to enter custom values
+				System.out.println("Please input the URL for online transactions (ex: https://www.testantivcnp.com/sandbox/communicator/online):");
+				config.put("url", stdin.readLine());
+				badInput = false;
+			} else {
+				// standard predefined cases
+				config.put("url", environSelected.getOnlineUrl());
+				badInput = false;
 			}
 		} while(badInput);
 
