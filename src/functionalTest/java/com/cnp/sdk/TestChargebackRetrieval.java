@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class TestChargebackRetrieval {
 
@@ -77,8 +78,13 @@ public class TestChargebackRetrieval {
         assertEquals("000000000", case1.getAcquirerReferenceNumber());
     }
 
-    @Test(expected = ChargebackException.class)
+    @Test
     public void testErrorResponse(){
-        ChargebackRetrievalResponse response = cbk.getActivityByCaseId(500L);
+        try{
+            ChargebackRetrievalResponse response = cbk.getActivityByCaseId(404L);
+            fail("Expected Exception");
+        } catch (ChargebackException e){
+            assertEquals("404 : Not Found", e.getMessage());
+        }
     }
 }

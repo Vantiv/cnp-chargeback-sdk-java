@@ -274,8 +274,8 @@ public class Communication {
         try{
             entity = response.getEntity();
             if (response.getStatusLine().getStatusCode() != 200) {
-                System.out.println(EntityUtils.toString(entity,XML_ENCODING));
-                throw new ChargebackException(response.getStatusLine().getStatusCode() + ":" +
+                System.out.println("\n" + EntityUtils.toString(entity,XML_ENCODING));
+                throw new ChargebackException(response.getStatusLine().getStatusCode() + " : " +
                         response.getStatusLine().getReasonPhrase());
             }
             xmlResponse = EntityUtils.toString(entity,XML_ENCODING);
@@ -300,14 +300,14 @@ public class Communication {
         try{
             entity = response.getEntity();
             if (response.getStatusLine().getStatusCode() != 200) {
-                System.out.println(EntityUtils.toString(entity, XML_ENCODING));
-                throw new ChargebackException(response.getStatusLine().getStatusCode() + ":" +
+                System.out.println("\n" + EntityUtils.toString(entity, XML_ENCODING));
+                throw new ChargebackException(response.getStatusLine().getStatusCode() + " : " +
                         response.getStatusLine().getReasonPhrase());
             }
 
             if(!"image/tiff".equals(entity.getContentType().getValue())){
                 String xmlResponse = EntityUtils.toString(entity, XML_ENCODING);
-                System.out.println(xmlResponse);
+                System.out.println("\n" + xmlResponse);
                 ChargebackDocumentUploadResponse responseObj = XMLConverter.generateDocumentResponse(xmlResponse);
                 throw new ChargebackException(responseObj.getResponseCode() + ":" + responseObj.getResponseMessage());
             }

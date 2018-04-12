@@ -7,7 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 public class TestCert {
@@ -52,51 +52,27 @@ public class TestCert {
         testChargebackCase(cases.get(8), "7777777770", "Visa Allocation", "ISSUER_DECLINE_PRESAB");
         testChargebackCase(cases.get(9), "7777777771", "Visa Allocation", "ISSUER_DECLINE_PRESAB");
         testChargebackCase(cases.get(10), "7777777772", "Visa Allocation", "ISSUER_DECLINE_PRESAB");
-
-
     }
 
     @Test
     public void test2(){
-        ChargebackRetrievalResponse retrievalResponse = cbkRetrieval.getActivityByARN("1111111111");
-        ChargebackApiCase caseBefore = retrievalResponse.getChargebackCases().get(0);
-        List<ChargebackApiActivity> activitiesBefore = caseBefore.getActivities();
-        Long caseId = caseBefore.getCaseId();
+        Long caseId = getCaseIdForArn("1111111111");
 
+        ChargebackUpdateResponse updateResponse = cbkUpdate.addNoteToCase(caseId, "Cert test2");
 
-        String note = "Cert test2: " + System.currentTimeMillis();
-        ChargebackUpdateResponse updateResponse = cbkUpdate.addNoteToCase(caseId, note);
+        ChargebackApiActivity activity = getLastActivity(caseId);
 
-        retrievalResponse = cbkRetrieval.getActivityByARN("1111111111");
-        ChargebackApiCase caseAfter = retrievalResponse.getChargebackCases().get(0);
-        List<ChargebackApiActivity> activitiesAfter = caseAfter.getActivities();
-
-        boolean activityFound = false;
-
-        for (ChargebackApiActivity activity: activitiesAfter) {
-            if (activity.getNotes().equals(note)) {
-                assertEquals(ActivityType.ADD_NOTE.toString(), activity.getActivityType());
-                activityFound = true;
-            }
-        }
-
-        assertTrue(activityFound);
-
+        assertEquals(ActivityType.ADD_NOTE.toString(), activity.getActivityType());
+        assertEquals("Cert test2", activity.getNotes());
     }
 
     @Test
     public void test3_1(){
-        ChargebackRetrievalResponse retrievalResponse = cbkRetrieval.getActivityByARN("2222222222");
-        ChargebackApiCase caseBefore = retrievalResponse.getChargebackCases().get(0);
-//        List<ChargebackApiActivity> activitiesBefore = caseBefore.getActivities();
-        Long caseId = caseBefore.getCaseId();
+        Long caseId = getCaseIdForArn("2222222222");
 
         ChargebackUpdateResponse updateResponse = cbkUpdate.representCase(caseId, "Cert test3_1");
 
-        retrievalResponse = cbkRetrieval.getActivityByARN("2222222222");
-        ChargebackApiCase caseAfter = retrievalResponse.getChargebackCases().get(0);
-        List<ChargebackApiActivity> activitiesAfter = caseAfter.getActivities();
-        ChargebackApiActivity activity = activitiesAfter.get(activitiesAfter.size() -1);
+        ChargebackApiActivity activity = getLastActivity(caseId);
 
         assertEquals(ActivityType.MERCHANT_REPRESENT.toString(), activity.getActivityType());
         assertEquals("Cert test3_1", activity.getNotes());
@@ -105,17 +81,11 @@ public class TestCert {
 
     @Test
     public void test3_2(){
-        ChargebackRetrievalResponse retrievalResponse = cbkRetrieval.getActivityByARN("3333333333");
-        ChargebackApiCase caseBefore = retrievalResponse.getChargebackCases().get(0);
-//        List<ChargebackApiActivity> activitiesBefore = caseBefore.getActivities();
-        Long caseId = caseBefore.getCaseId();
+        Long caseId = getCaseIdForArn("3333333333");
 
         ChargebackUpdateResponse updateResponse = cbkUpdate.representCase(caseId, 10027L,"Cert test3_2");
 
-        retrievalResponse = cbkRetrieval.getActivityByARN("3333333333");
-        ChargebackApiCase caseAfter = retrievalResponse.getChargebackCases().get(0);
-        List<ChargebackApiActivity> activitiesAfter = caseAfter.getActivities();
-        ChargebackApiActivity activity = activitiesAfter.get(activitiesAfter.size() -1);
+        ChargebackApiActivity activity = getLastActivity(caseId);
 
         assertEquals(ActivityType.MERCHANT_REPRESENT.toString(), activity.getActivityType());
         assertEquals(new Long(10027L), activity.getSettlementAmount());
@@ -124,29 +94,142 @@ public class TestCert {
     }
 
     @Test
-    public void test4(){
-        ChargebackRetrievalResponse retrievalResponse = cbkRetrieval.getActivityByARN("4444444444");
-        ChargebackApiCase caseBefore = retrievalResponse.getChargebackCases().get(0);
-//        List<ChargebackApiActivity> activitiesBefore = caseBefore.getActivities();
-        Long caseId = caseBefore.getCaseId();
+    public void test4_and_5_1(){
+        //test4
+        Long caseId = getCaseIdForArn("4444444444");
 
         ChargebackUpdateResponse updateResponse = cbkUpdate.assumeLiability(caseId, "Cert test4");
 
-        retrievalResponse = cbkRetrieval.getActivityByARN("4444444444");
-        ChargebackApiCase caseAfter = retrievalResponse.getChargebackCases().get(0);
-        List<ChargebackApiActivity> activitiesAfter = caseAfter.getActivities();
-        ChargebackApiActivity activity = activitiesAfter.get(activitiesAfter.size() -1);
+        ChargebackApiActivity activity = getLastActivity(caseId);
 
         assertEquals(ActivityType.MERCHANT_ACCEPTS_LIABILITY.toString(), activity.getActivityType());
-        assertEquals("Cert test3_2", activity.getNotes());
+        assertEquals("Cert test4", activity.getNotes());
 
+        //test5_1
+        try{
+            updateResponse = cbkUpdate.assumeLiability(caseId, "Cert test5_1");
+            fail("Expected Exception");
+        } catch(ChargebackException e){
+            assertEquals("400 : Bad Request", e.getMessage());
+        }
     }
 
+    @Test
+    public void test5_2(){
+        try{
+            ChargebackRetrievalResponse retrievalResponse1 = cbkRetrieval.getActivityByCaseId(1234L);
+            fail("Expected Exception");
+        } catch(ChargebackException e){
+            assertEquals("404 : Not Found", e.getMessage());
+        }
+    }
+
+    @Test
+    public void test6_1(){
+        Long caseId = getCaseIdForArn("5555555550");
+
+        ChargebackUpdateResponse updateResponse = cbkUpdate.representCase(caseId, "Cert test6_1");
+
+        ChargebackApiActivity activity = getLastActivity(caseId);
+
+        assertEquals(ActivityType.MERCHANT_REPRESENT.toString(), activity.getActivityType());
+        assertEquals("Cert test6_1", activity.getNotes());
+    }
+
+    @Test
+    public void test6_2(){
+        Long caseId = getCaseIdForArn("5555555551");
+
+        ChargebackUpdateResponse updateResponse = cbkUpdate.representCase(caseId, 10051L,"Cert test6_2");
+
+        ChargebackApiActivity activity = getLastActivity(caseId);
+
+        assertEquals(ActivityType.MERCHANT_REPRESENT.toString(), activity.getActivityType());
+        assertEquals(new Long(10051L), activity.getSettlementAmount());
+        assertEquals("Cert test6_2", activity.getNotes());
+    }
+
+    @Test
+    public void test7(){
+        //test4
+        Long caseId = getCaseIdForArn("5555555552");
+
+        ChargebackUpdateResponse updateResponse = cbkUpdate.assumeLiability(caseId, "Cert test7");
+
+        ChargebackApiActivity activity = getLastActivity(caseId);
+
+        assertEquals(ActivityType.MERCHANT_ACCEPTS_LIABILITY.toString(), activity.getActivityType());
+        assertEquals("Cert test7", activity.getNotes());
+    }
+
+    @Test
+    public void test8(){
+        //test4
+        Long caseId = getCaseIdForArn("6666666660");
+
+        ChargebackUpdateResponse updateResponse = cbkUpdate.assumeLiability(caseId, "Cert test8");
+
+        ChargebackApiActivity activity = getLastActivity(caseId);
+
+        assertEquals(ActivityType.MERCHANT_ACCEPTS_LIABILITY.toString(), activity.getActivityType());
+        assertEquals("Cert test8", activity.getNotes());
+    }
+
+    @Test
+    public void test9_1(){
+        Long caseId = getCaseIdForArn("7777777770");
+
+        ChargebackUpdateResponse updateResponse = cbkUpdate.representCase(caseId, "Cert test9_1");
+
+        ChargebackApiActivity activity = getLastActivity(caseId);
+
+        assertEquals(ActivityType.MERCHANT_REPRESENT.toString(), activity.getActivityType());
+        assertEquals("Cert test9_1", activity.getNotes());
+    }
+
+    @Test
+    public void test9_2(){
+        Long caseId = getCaseIdForArn("7777777771");
+
+        ChargebackUpdateResponse updateResponse = cbkUpdate.representCase(caseId, 10071L,"Cert test9_2");
+
+        ChargebackApiActivity activity = getLastActivity(caseId);
+
+        assertEquals(ActivityType.MERCHANT_REPRESENT.toString(), activity.getActivityType());
+        assertEquals(new Long(10071L), activity.getSettlementAmount());
+        assertEquals("Cert test9_2", activity.getNotes());
+    }
+
+    @Test
+    public void test10(){
+        //test4
+        Long caseId = getCaseIdForArn("7777777772");
+
+        ChargebackUpdateResponse updateResponse = cbkUpdate.assumeLiability(caseId, "Cert test10");
+
+        ChargebackApiActivity activity = getLastActivity(caseId);
+
+        assertEquals(ActivityType.MERCHANT_ACCEPTS_LIABILITY.toString(), activity.getActivityType());
+        assertEquals("Cert test10", activity.getNotes());
+    }
 
     @Test
     private void testChargebackCase(ChargebackApiCase cbkcase, String arn, String cbkflow, String casecycle){
         assertEquals(arn, cbkcase.getAcquirerReferenceNumber());
 //        assertEquals(cbkflow, cbkcase.get());
         assertEquals(casecycle, cbkcase.getCycle());
+    }
+
+    @Test
+    private Long getCaseIdForArn(String arn){
+        ChargebackRetrievalResponse retrievalResponse = cbkRetrieval.getActivityByARN(arn);
+        return retrievalResponse.getChargebackCases().get(0).getCaseId();
+    }
+
+    private ChargebackApiActivity getLastActivity(Long caseId){
+        ChargebackRetrievalResponse retrievalResponse = cbkRetrieval.getActivityByCaseId(caseId);
+        ChargebackApiCase caseAfter = retrievalResponse.getChargebackCases().get(0);
+        List<ChargebackApiActivity> activitiesAfter = caseAfter.getActivities();
+        return activitiesAfter.get(activitiesAfter.size() -1);
     }
 }
