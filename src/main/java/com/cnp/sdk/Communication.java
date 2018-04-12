@@ -180,7 +180,7 @@ public class Communication {
     /**
      *  Method to send given HttpRequest to server, after preparing it. Returns response from server
      */
-    public String sendHttpRequestToCnp(HttpRequestBase baseRequest, Properties config){
+    private String sendHttpRequestToCnp(HttpRequestBase baseRequest, Properties config){
         HttpResponse response = execHttpRequest(baseRequest, config);
         String xmlResponse = validateResponse(response);
         printToConsole("\nResponse XML: \n", xmlResponse, config);
@@ -190,7 +190,7 @@ public class Communication {
     /**
      *  Method to execute HttpRequest: given http request is sent, and receieved response is returned after validation
      */
-    public HttpResponse execHttpRequest(HttpRequestBase baseRequest, Properties config){
+    private HttpResponse execHttpRequest(HttpRequestBase baseRequest, Properties config){
         prepareHttpRequest(baseRequest, config);
         try {
             return httpClient.execute(baseRequest);
@@ -204,7 +204,7 @@ public class Communication {
     /**
      *  Method to prepare HttpRequest: set default headers, configs to given http request
      */
-    public void prepareHttpRequest(HttpRequestBase baseRequest, Properties config){
+    private void prepareHttpRequest(HttpRequestBase baseRequest, Properties config){
         String proxyHost = config.getProperty("proxyHost");
         String proxyPort = config.getProperty("proxyPort");
         int httpTimeout = Integer.valueOf(config.getProperty("timeout", "6000"));
