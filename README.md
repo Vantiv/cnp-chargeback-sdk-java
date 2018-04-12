@@ -39,37 +39,16 @@ Setup
 4. Use it:
 
 ```java
+ChargebackRetrieval cbkRetrieval = new ChargebackRetrieval();
+ChargebackRetrievalResponse response = cbkRetrieval.getActivityByARN("000000000");
 
-import com.cnp.sdk.*;
-import com.cnp.sdk.generated.*
+ChargebackApiCase case1 = response.getChargebackCases().get(0);
+Long caseId = case1.getCaseId();
 
-public class SampleCnpTxn {
+ChargebackUpdate cbkUpdate = new ChargebackUpdate();
+ChargebackUpdateResponse response = cbkUpdate.addNoteToCase(123L, "Sample chargeback");
 
-import com.cnp.sdk.*;
-import com.cnp.sdk.generated.*;
-public class SampleCnpTxn {
-
-
-	public static void main(String[] args) {
-
-		// Visa $10 Sale
-		Sale sale = new Sale();
-		sale.setReportGroup("Planets");
-		sale.setOrderId("12344");
-		sale.setAmount(1000L);
-		sale.setOrderSource(OrderSourceType.ECOMMERCE);
-		CardType card = new CardType();
-		card.setType(MethodOfPaymentTypeEnum.VI);
-		card.setNumber("4100000000000002");
-		card.setExpDate("1210");
-		sale.setCard(card);
-		
-		// Peform the transaction on the Vantiv eCommerce Platform
-		SaleResponse response = new CnpOnline().sale(sale);
-
-		// display result
-		System.out.println("Message: " + response.getMessage());
-		System.out.println("Vantiv eCommerce Transaction ID: " + response.getCnpTxnId());
-	}
-}
+ChargebackDocument cbkDocument = new ChargebackDocument();
+File documentToUpload = new File("invoice.pdf");
+ChargebackDocumentUploadResponse = cbkDocument.uploadDocument(caseId, documentToUpload);
 ```
