@@ -110,6 +110,6 @@ public class ChargebackUpdate {
     private ChargebackUpdateResponse getUpdateResponse(Long caseId, ChargebackUpdateRequest request){
         String xmlRequest = XMLConverter.generateUpdateRequest(request);
         String requestUrl = baseurl + caseId;
-        return communication.putUpdateRequest(xmlRequest, requestUrl, config);
+        return communication.httpPutUpdateRequest(xmlRequest, requestUrl, config);
     }
 }

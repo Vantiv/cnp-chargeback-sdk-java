@@ -96,6 +96,10 @@ public class Communication {
         return bestProtocol;
     }
 
+    ////////////////////////////////////////////////////////////////////
+    //                Chargeback service end points:                  //
+    ////////////////////////////////////////////////////////////////////
+
     public File httpGetDocumentRequest(String filepath, String requestUrl, Properties config) {
         File document;
         HttpGet get = new HttpGet(requestUrl);
@@ -115,89 +119,59 @@ public class Communication {
         return document;
     }
 
-    ////////////////////////////////////////////////////////////////////
-    //                    Return response objects:                    //
-    ////////////////////////////////////////////////////////////////////
-
-    public ChargebackDocumentUploadResponse getDocumentListRequest(String requestUrl, Properties config) {
-        String response = httpGetDocumentListRequest(requestUrl, config);
-        return XMLConverter.generateDocumentResponse(response);
-    }
-
-    public ChargebackDocumentUploadResponse postDocumentRequest(File file, String requestUrl, Properties config) {
-        String response = httpPostDocumentRequest(file, requestUrl, config);
-        return XMLConverter.generateDocumentResponse(response);
-    }
-    public ChargebackDocumentUploadResponse putDocumentRequest(File file, String requestUrl, Properties config) {
-        String response = httpPutDocumentRequest(file, requestUrl, config);
-        return XMLConverter.generateDocumentResponse(response);
-    }
-
-    public ChargebackDocumentUploadResponse deleteDocumentRequest(String requestUrl, Properties config) {
-        String response = httpDeleteDocumentRequest(requestUrl, config);
-        return XMLConverter.generateDocumentResponse(response);
-    }
-
-    public ChargebackRetrievalResponse getRetrievalRequest(String requestUrl, Properties config) {
-        String response = httpGetRetrievalRequest(requestUrl, config);
-        return XMLConverter.generateRetrievalResponse(response);
-    }
-
-    public ChargebackUpdateResponse putUpdateRequest(String xmlRequest, String requestUrl, Properties config) {
-        String response = httpPutUpdateRequest(xmlRequest, requestUrl, config);
-        return XMLConverter.generateUpdateResponse(response);
-    }
-
-    ////////////////////////////////////////////////////////////////////
-    //                    Return xml string response:                 //
-    ////////////////////////////////////////////////////////////////////
-
-    public String httpGetDocumentListRequest(String requestUrl, Properties config) {
+    public ChargebackDocumentUploadResponse httpGetDocumentListRequest(String requestUrl, Properties config) {
         HttpGet get = new HttpGet(requestUrl);
         printToConsole("\nGET request to url: \n", requestUrl, config);
-        return sendHttpRequestToCnp(get, config);
+        String response = sendHttpRequestToCnp(get, config);
+        return XMLConverter.generateDocumentResponse(response);
     }
 
-    public String httpPostDocumentRequest(File file, String requestUrl, Properties config) {
+    public ChargebackDocumentUploadResponse httpPostDocumentRequest(File file, String requestUrl, Properties config) {
         HttpPost post = new HttpPost(requestUrl);
         post.setHeader(CONTENT_TYPE_HEADER, getFileContentType(file));
         post.setEntity(new FileEntity(file));
         printToConsole("\nPOST request to url: \n", requestUrl, config);
         printToConsole("\nEntity: \n", file.getName(), config);
-        return sendHttpRequestToCnp(post, config);
+        String response = sendHttpRequestToCnp(post, config);
+        return XMLConverter.generateDocumentResponse(response);
+
     }
 
-    public String httpPutDocumentRequest(File file, String requestUrl, Properties config) {
+    public ChargebackDocumentUploadResponse httpPutDocumentRequest(File file, String requestUrl, Properties config) {
         HttpPut put = new HttpPut(requestUrl);
         put.setHeader(CONTENT_TYPE_HEADER, getFileContentType(file));
         put.setEntity(new FileEntity(file));
         printToConsole("\nPUT request to url: \n", requestUrl, config);
         printToConsole("\nEntity: \n", file.getName(), config);
-        return sendHttpRequestToCnp(put, config);
+        String response = sendHttpRequestToCnp(put, config);
+        return XMLConverter.generateDocumentResponse(response);
     }
 
-    public String httpDeleteDocumentRequest(String requestUrl, Properties config) {
+    public ChargebackDocumentUploadResponse httpDeleteDocumentRequest(String requestUrl, Properties config) {
         HttpDelete delete = new HttpDelete(requestUrl);
         printToConsole("\nDELETE request to url: \n", requestUrl, config);
-        return sendHttpRequestToCnp(delete, config);
+        String response = sendHttpRequestToCnp(delete, config);
+        return XMLConverter.generateDocumentResponse(response);
     }
 
-    public String httpGetRetrievalRequest(String requestUrl, Properties config) {
+    public ChargebackRetrievalResponse httpGetRetrievalRequest(String requestUrl, Properties config) {
         HttpGet get = new HttpGet(requestUrl);
         get.setHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_VALUE);
         get.setHeader(ACCEPT_HEADER, CONTENT_TYPE_VALUE);
         printToConsole("\nGET request to url: \n", requestUrl, config);
-        return sendHttpRequestToCnp(get, config);
+        String response = sendHttpRequestToCnp(get, config);
+        return XMLConverter.generateRetrievalResponse(response);
     }
 
-    public String httpPutUpdateRequest(String xmlRequest, String requestUrl, Properties config) {
+    public ChargebackUpdateResponse httpPutUpdateRequest(String xmlRequest, String requestUrl, Properties config) {
         HttpPut put = new HttpPut(requestUrl);
         put.setHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_VALUE);
         put.setHeader(ACCEPT_HEADER, CONTENT_TYPE_VALUE);
         put.setEntity(new StringEntity(xmlRequest, XML_ENCODING));
         printToConsole("\nPUT request to url: \n", requestUrl, config);
         printToConsole("\nRequest XML: \n", xmlRequest, config);
-        return sendHttpRequestToCnp(put, config);
+        String response = sendHttpRequestToCnp(put, config);
+        return XMLConverter.generateUpdateResponse(response);
     }
 
     ////////////////////////////////////////////////////////////////////

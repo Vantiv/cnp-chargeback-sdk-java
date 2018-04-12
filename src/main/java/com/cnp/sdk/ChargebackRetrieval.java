@@ -122,6 +122,6 @@ public class ChargebackRetrieval {
 
     private ChargebackRetrievalResponse sendRetrievalRequest(String urlSuffix){
         String requestUrl = baseurl + urlSuffix;
-        return communication.getRetrievalRequest(requestUrl, config);
+        return communication.httpGetRetrievalRequest(requestUrl, config);
     }
 }

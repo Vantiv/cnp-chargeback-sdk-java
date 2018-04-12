@@ -50,7 +50,7 @@ public class TestChargebackDocument {
                 "</chargebackDocumentUploadResponse>";
         ChargebackDocumentUploadResponse expectedResponse = XMLConverter.generateDocumentResponse(mockedResponse);
         Communication mockedCommunication = mock(Communication.class);
-        when(mockedCommunication.postDocumentRequest(any(File.class), matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
+        when(mockedCommunication.httpPostDocumentRequest(any(File.class), matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
 
         cbk.setCommunication(mockedCommunication);
         ChargebackDocumentUploadResponse response = cbk.uploadDocument(123000L, documentToUpload);
@@ -83,7 +83,7 @@ public class TestChargebackDocument {
                 "</chargebackDocumentUploadResponse>";
         ChargebackDocumentUploadResponse expectedResponse = XMLConverter.generateDocumentResponse(mockedResponse);
         Communication mockedCommunication = mock(Communication.class);
-        when(mockedCommunication.putDocumentRequest(any(File.class), matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
+        when(mockedCommunication.httpPutDocumentRequest(any(File.class), matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
 
         cbk.setCommunication(mockedCommunication);
         ChargebackDocumentUploadResponse response = cbk.replaceDocument(123000L, documentToUpload);
@@ -103,7 +103,7 @@ public class TestChargebackDocument {
                 "</chargebackDocumentUploadResponse>";
         ChargebackDocumentUploadResponse expectedResponse = XMLConverter.generateDocumentResponse(mockedResponse);
         Communication mockedCommunication = mock(Communication.class);
-        when(mockedCommunication.deleteDocumentRequest(matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
+        when(mockedCommunication.httpDeleteDocumentRequest(matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
 
         cbk.setCommunication(mockedCommunication);
         ChargebackDocumentUploadResponse response = cbk.removeDocument(123000L, "logo.tiff");
@@ -124,7 +124,7 @@ public class TestChargebackDocument {
                 "</chargebackDocumentUploadResponse>";
         ChargebackDocumentUploadResponse expectedResponse = XMLConverter.generateDocumentResponse(mockedResponse);
         Communication mockedCommunication = mock(Communication.class);
-        when(mockedCommunication.getDocumentListRequest(matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
+        when(mockedCommunication.httpGetDocumentListRequest(matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
 
         cbk.setCommunication(mockedCommunication);
         ChargebackDocumentUploadResponse response = cbk.listDocuments(123000L);
