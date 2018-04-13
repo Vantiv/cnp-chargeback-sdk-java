@@ -2,6 +2,7 @@ package com.cnp.sdk;
 
 import com.cnp.sdk.generate.ChargebackDocumentUploadResponse;
 import com.cnp.sdk.generate.ChargebackRetrievalResponse;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -34,17 +35,22 @@ public class TestCertDocumentation {
     private File documentToUpload4;
 
     @Before
-    public void setup(){
+    public void setup() throws IOException {
         Properties config = (new Configuration()).getProperties();
-        config.setProperty("url", "ChargebackDocument://services.vantivprelive.com/services/chargebacks/");
+        config.setProperty("url", "https://services.vantivprelive.com/services/chargebacks/");
         merchantId = config.getProperty("merchantId");
         cbkRetrieval = new ChargebackRetrieval(config);
         cbkUpdate = new ChargebackUpdate(config);
         cbkDocument = new ChargebackDocument(config);
         documentToUpload1 = new File("test.jpg");
+        documentToUpload1.createNewFile();
         documentToUpload2 = new File("test.gif");
+        documentToUpload2.createNewFile();
         documentToUpload3 = new File("test.pdf");
+        documentToUpload3.createNewFile();
         documentToUpload4 = new File("test.tiff");
+        documentToUpload4.createNewFile();
+
     }
 
     @Test
@@ -111,13 +117,14 @@ public class TestCertDocumentation {
         Long caseId = Long.valueOf(merchantId + "004");
         ChargebackDocumentUploadResponse documentResponse = cbkDocument.uploadDocument(caseId, documentToUpload1);
         assertEquals("004", documentResponse.getResponseCode());
-        assertEquals("Case not in Merchant Queue", documentResponse.getResponseMessage());
+        assertEquals("Case Not In Merchant Queue", documentResponse.getResponseMessage());
     }
 
     @Test
-    public void test4(){
+    public void test4() throws IOException{
         Long caseId = Long.valueOf(merchantId + "004");
         File maxsize = new File("maxsize.tif");
+        maxsize.createNewFile();
         ChargebackDocumentUploadResponse documentResponse = cbkDocument.uploadDocument(caseId, maxsize);
         assertEquals("005", documentResponse.getResponseCode());
         assertEquals("Document already exists", documentResponse.getResponseMessage());
@@ -144,7 +151,7 @@ public class TestCertDocumentation {
 
     }
 
-    @Test
+    @After
     public void tearDown(){
         documentToUpload1.delete();
         documentToUpload2.delete();
