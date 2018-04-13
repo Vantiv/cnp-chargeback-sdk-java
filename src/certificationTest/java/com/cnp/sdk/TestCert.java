@@ -1,11 +1,17 @@
 package com.cnp.sdk;
 
-import com.cnp.sdk.generate.*;
+import com.cnp.sdk.generate.ChargebackApiActivity;
+import com.cnp.sdk.generate.ChargebackApiCase;
+import com.cnp.sdk.generate.ChargebackRetrievalResponse;
+import com.cnp.sdk.generate.ChargebackUpdateResponse;
 import org.junit.Before;
 import org.junit.Test;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.*;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Properties;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -24,10 +30,8 @@ public class TestCert {
     final String ACTIVITY_ADD_NOTE = "Add Note";
 
     @Before
-    public void setup() throws IOException {
-        Properties config = new Properties();
-        FileInputStream fileInputStream = new FileInputStream((new Configuration()).location());
-        config.load(fileInputStream);
+    public void setup(){
+        Properties config = (new Configuration()).getProperties();
         config.setProperty("url", "https://services.vantivprelive.com/services/chargebacks/");
         cbkRetrieval = new ChargebackRetrieval(config);
         cbkUpdate = new ChargebackUpdate(config);

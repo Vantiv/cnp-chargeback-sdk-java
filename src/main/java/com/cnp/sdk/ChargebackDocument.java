@@ -69,8 +69,8 @@ public class ChargebackDocument {
         return communication.httpGetDocumentRequest(filepath, requestUrl, config);
     }
 
-    public ChargebackDocumentUploadResponse replaceDocument(Long caseId, File document){
-        String requestUrl = baseUrl + "/replace/" + caseId + "/" + document.getName();
+    public ChargebackDocumentUploadResponse replaceDocument(Long caseId, String documentId, File document){
+        String requestUrl = baseUrl + "/replace/" + caseId + "/" + documentId;
         return communication.httpPutDocumentRequest(document, requestUrl, config);
     }
 

@@ -75,5 +75,9 @@ public class TestCommunication {
 		assertEquals("TLSv1.2", Communication.getBestProtocol(new String[] {"TLSv1.1", "TLSv1.2"}));
 	}
 
+	public void test(){
+
+	}
+
 }
 

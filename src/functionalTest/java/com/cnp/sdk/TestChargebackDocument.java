@@ -51,7 +51,7 @@ public class TestChargebackDocument {
 
     @Test
     public void testChargebackReplaceDocument(){
-        ChargebackDocumentUploadResponse response = cbk.replaceDocument(123000L, documentToUpload);
+        ChargebackDocumentUploadResponse response = cbk.replaceDocument(123000L, "logo.tiff", documentToUpload);
         assertEquals("000", response.getResponseCode());
         assertEquals("Success", response.getResponseMessage());
     }
