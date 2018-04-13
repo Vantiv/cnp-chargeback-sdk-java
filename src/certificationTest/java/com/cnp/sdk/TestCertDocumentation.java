@@ -146,7 +146,7 @@ public class TestCertDocumentation {
 
         documentResponse = cbkDocument.uploadDocument(caseId, documentToUpload1);
         assertEquals("008", documentResponse.getResponseCode());
-        assertEquals("Max Document Limit Per Case Reached</", documentResponse.getResponseMessage());
+        assertEquals("Max Document Limit Per Case Reached", documentResponse.getResponseMessage());
 
 
     }
