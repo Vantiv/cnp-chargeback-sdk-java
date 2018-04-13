@@ -104,21 +104,21 @@ public class ChargebackRetrieval {
 
     // Use if there are a lot of parameters
 
-    private ChargebackRetrievalResponse getRetrievalResponse(Map<String, String> parameters){
-        String urlSuffix = buildUrl(parameters);
-        return sendRetrievalRequest(urlSuffix);
-    }
-
-    private String buildUrl(Map<String, String> parameters){
-        StringBuilder sb = new StringBuilder();
-        String prefix = "/?";
-        for (Map.Entry entry : parameters.entrySet()) {
-            sb.append(prefix);
-            prefix = "&";
-            sb.append(entry.getKey()).append("=").append(entry.getValue());
-        }
-        return sb.toString();
-    }
+//    private ChargebackRetrievalResponse getRetrievalResponse(Map<String, String> parameters){
+//        String urlSuffix = buildUrl(parameters);
+//        return sendRetrievalRequest(urlSuffix);
+//    }
+//
+//    private String buildUrl(Map<String, String> parameters){
+//        StringBuilder sb = new StringBuilder();
+//        String prefix = "/?";
+//        for (Map.Entry entry : parameters.entrySet()) {
+//            sb.append(prefix);
+//            prefix = "&";
+//            sb.append(entry.getKey()).append("=").append(entry.getValue());
+//        }
+//        return sb.toString();
+//    }
 
     private ChargebackRetrievalResponse sendRetrievalRequest(String urlSuffix){
         String requestUrl = baseurl + urlSuffix;

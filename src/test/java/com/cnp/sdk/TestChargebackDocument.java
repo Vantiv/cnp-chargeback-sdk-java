@@ -25,15 +25,7 @@ public class TestChargebackDocument {
 
     @Before
     public void setup() throws IOException {
-        String username = "merchant1";
-        String password = "password";
-        Properties config = new Properties();
-        FileInputStream fileInputStream = new FileInputStream((new Configuration()).location());
-        config.load(fileInputStream);
-        fileInputStream.close();
-        config.setProperty("username", username);
-        config.setProperty("password", password);
-        cbk = new ChargebackDocument(config);
+        cbk = new ChargebackDocument();
         documentToUpload = new File("test.tiff");
         documentToUpload.createNewFile();
     }

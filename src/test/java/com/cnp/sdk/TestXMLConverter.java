@@ -3,6 +3,8 @@ package com.cnp.sdk;
 import com.cnp.sdk.generate.*;
 import org.junit.Test;
 
+import javax.xml.bind.JAXBException;
+
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 
@@ -51,6 +53,23 @@ public class TestXMLConverter {
         assertNotNull(case1.getCaseId());
     }
 
+    @Test(expected = ChargebackException.class)
+    public void testGenerateRetrievalResponseError(){
+        String responseStr = "<chargebackRetrievalResponse>\n" +
+                "  <transactionId>1234567890</transactionId>\n" +
+                "  <chargebackCase>\n" +
+                "    <caseId>123</caseId>\n" +
+                "    <merchantId>Merchant01</merchantId>\n" +
+                "    <dayIssuedByBank>2018-02-15</dayIssuedByBank>\n" +
+                "    <dayReceivedByVantivCnp>2018-02-15</dayReceivedByVantivCnp>\n" +
+                "    <customerId>123abc</customerId>\n" +
+                "    <paymentAmount>3099</paymentAmount>\n" +
+                "    <replyByDay>2018-02-15</replyByDay>\n" +
+                "  </chargebackCase>\n" +
+                "</chargebackRetrievalResponse>";
+        ChargebackRetrievalResponse response = XMLConverter.generateRetrievalResponse(responseStr);
+    }
+
     @Test
     public void testGenerateUpdateResponse(){
         String responseStr = "<chargebackUpdateResponse xmlns=\"http://www.vantivcnp.com/chargebacks\">\n" +
@@ -59,6 +78,14 @@ public class TestXMLConverter {
         ChargebackUpdateResponse response = XMLConverter.generateUpdateResponse(responseStr);
         assertNotNull(response);
         assertNotNull(response.getTransactionId());
+    }
+
+    @Test(expected = ChargebackException.class)
+    public void testGenerateUpdateResponseError(){
+        String responseStr = "<chargebackUpdateResponse>\n" +
+                "  <transactionId>21260530003675</transactionId>\n" +
+                "</chargebackUpdateResponse>";
+        ChargebackUpdateResponse response = XMLConverter.generateUpdateResponse(responseStr);
     }
 
     @Test
@@ -74,6 +101,17 @@ public class TestXMLConverter {
         ChargebackDocumentUploadResponse response = XMLConverter.generateDocumentResponse(xmlResponse);
         assertNotNull(response);
         assertEquals("009", response.getResponseCode());
+    }
+
+    @Test(expected = ChargebackException.class)
+    public void testGenerateDocumentResponseError(){
+        String xmlResponse = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                "<chargebackDocumentUploadResponse>\n" +
+                "  <merchantId>999</merchantId>\n" +
+                "  <responseCode>009</responseCode>\n" +
+                "  <responseMessage>Document Not Found</responseMessage>\n" +
+                "</chargebackDocumentUploadResponse>\n";
+        ChargebackDocumentUploadResponse response = XMLConverter.generateDocumentResponse(xmlResponse);
     }
 
     @Test
@@ -99,5 +137,16 @@ public class TestXMLConverter {
         ErrorResponse response = XMLConverter.generateErrorResponse(xmlResponse);
         assertNotNull(response);
         assertEquals("Could not find requested object.", response.getErrors().getErrors().get(0));
+    }
+
+    @Test(expected = ChargebackException.class)
+    public void testGenerateErrorResponseError(){
+        String xmlResponse = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                "<errorResponse>\n" +
+                "  <errors>\n" +
+                "    <error>Could not find requested object.</error>\n" +
+                "  </errors>\n" +
+                "</errorResponse>";
+        ErrorResponse response = XMLConverter.generateErrorResponse(xmlResponse);
     }
 }
