@@ -37,6 +37,12 @@ public class TestChargebackUpdate {
     }
 
     @Test
+    public void testChargebackRepresentFull(){
+        ChargebackUpdateResponse response = cbk.representCase(123L, "Test represented");
+        assertNotNull(response.getTransactionId());
+    }
+
+    @Test
     public void testChargebackRespondToUpdateRequest(){
         ChargebackUpdateResponse response = cbk.respondToRetrievalRequest(123L, "Test responded to Update request");
         assertNotNull(response.getTransactionId());
