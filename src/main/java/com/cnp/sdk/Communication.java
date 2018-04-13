@@ -181,8 +181,7 @@ public class Communication {
      *  Method to send given HttpRequest to server, after preparing it. Returns response from server
      */
     private String sendHttpRequestToCnp(HttpRequestBase baseRequest, Properties config){
-        HttpResponse response = execHttpRequest(baseRequest, config);
-        String xmlResponse = validateResponse(response);
+        String xmlResponse = execHttpRequest(baseRequest, config);
         printToConsole("\nResponse XML: \n", xmlResponse, config);
         return xmlResponse;
     }
@@ -190,10 +189,11 @@ public class Communication {
     /**
      *  Method to execute HttpRequest: given http request is sent, and receieved response is returned after validation
      */
-    private HttpResponse execHttpRequest(HttpRequestBase baseRequest, Properties config){
+    private String execHttpRequest(HttpRequestBase baseRequest, Properties config){
         prepareHttpRequest(baseRequest, config);
         try {
-            return httpClient.execute(baseRequest);
+            HttpResponse response = httpClient.execute(baseRequest);
+            return validateResponse(response);
         } catch (IOException e) {
             throw new ChargebackException(CONNECTION_EXCEPTION_MESSAGE, e);
         } finally {

@@ -93,4 +93,20 @@ public class TestChargebackUpdate {
         ChargebackUpdateResponse response = cbk.respondToRetrievalRequest(123L, "Test responded to Update request");
         assertNotNull(response.getTransactionId());
     }
+
+    @Test
+    public void testChargebackRequestArbitration(){
+        String expectedRequestUrl = ".*?chargebacks.*?/123";
+        String expectedRequest = ".*?<chargebackUpdateRequest .*?><activityType>MERCHANT_REQUESTS_ARBITRATION</activityType><note>Test responded to Update request</note></chargebackUpdateRequest>";
+        String mockedResponse = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                "<chargebackUpdateResponse xmlns=\"http://www.vantivcnp.com/chargebacks\">\n" +
+                "  <transactionId>21260530003675</transactionId>\n" +
+                "</chargebackUpdateResponse>";
+        ChargebackUpdateResponse expectedResponse = XMLConverter.generateUpdateResponse(mockedResponse);
+        Communication mockedCommunication = mock(Communication.class);
+        when(mockedCommunication.httpPutUpdateRequest(matches(expectedRequest), matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
+
+        ChargebackUpdateResponse response = cbk.respondToRetrievalRequest(123L, "Test responded to Update request");
+        assertNotNull(response.getTransactionId());
+    }
 }

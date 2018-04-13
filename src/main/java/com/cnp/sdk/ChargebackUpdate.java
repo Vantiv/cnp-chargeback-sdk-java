@@ -104,6 +104,13 @@ public class ChargebackUpdate {
         return getUpdateResponse(caseId, request);
     }
 
+    public ChargebackUpdateResponse requestArbitration(Long caseId, String note){
+        ChargebackUpdateRequest request = new ChargebackUpdateRequest();
+        request.setActivityType(ActivityType.MERCHANT_REQUESTS_ARBITRATION);
+        request.setNote(note);
+        return getUpdateResponse(caseId, request);
+    }
+
 
     ////////////////////////////////////////////////////////////////////
 

@@ -43,6 +43,12 @@ public class TestChargebackUpdate {
     }
 
     @Test
+    public void testChargebackRequestArbitration(){
+        ChargebackUpdateResponse response = cbk.requestArbitration(123L, "Test responded to Update request");
+        assertNotNull(response.getTransactionId());
+    }
+
+    @Test
     public void testErrorResponse(){
         try{
             ChargebackUpdateResponse response = cbk.addNoteToCase(404L, "ErrorResponse");
