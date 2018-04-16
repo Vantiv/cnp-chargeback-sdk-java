@@ -152,13 +152,13 @@ task copyLibsToKit(type:Copy, dependsOn:check){
 task tarKit(type:Tar, dependsOn:[copyJarToKit, copyLibsToKit]){
     compression = Compression.GZIP
     destinationDir = file("$buildDir/kit")
-    archiveName = "cnp-sdk-for-java-${JAR_VERSION}.tar.gz"
+    archiveName = "cnp-chargeback-sdk-java-${JAR_VERSION}.tar.gz"
     from "$buildDir/kit/java15"
 }
 
 task zipKit(type:Zip, dependsOn:[copyJarToKit, copyLibsToKit]){
     destinationDir = file("$buildDir/kit")
-    archiveName = "cnp-sdk-for-java-${JAR_VERSION}.zip"
+    archiveName = "cnp-chargeback-sdk-java-${JAR_VERSION}.zip"
     from "$buildDir/kit/java15"
 }
 
