@@ -19,7 +19,6 @@ public class TestChargebackRetrieval {
         ChargebackApiCase case1 = response.getChargebackCases().get(0);
         assertNotNull(case1);
         assertNotNull(case1.getCaseId());
-        assertEquals("2018-01-01", CalendarPrinter.printDate(case1.getDateReceivedByVantivCnp()));
     }
 
     @Test
@@ -29,7 +28,6 @@ public class TestChargebackRetrieval {
         ChargebackApiCase case1 = response.getChargebackCases().get(0);
         assertNotNull(case1);
         assertNotNull(case1.getCaseId());
-        assertEquals("2018-01-01", CalendarPrinter.printDate(case1.getDateReceivedByVantivCnp()));
     }
 
     @Test
