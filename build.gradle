@@ -72,7 +72,7 @@ jar{
         attributes("Implementation-Title":"Chargeback SDK For Java 1.5 and greater", "Implementation-Version":"${JAR_VERSION}","Implementation-Vendor":"vantiv","Main-Class":"com.cnp.sdk.Setup")
     }
     destinationDir = file("${DIST_DIR_15}/lib")
-    archiveName = "cnp-sdk-for-java-${JAR_VERSION}.jar"
+    archiveName = "cnp-chargeback-sdk-java-${JAR_VERSION}.jar"
 }
 
 javadoc{
@@ -102,7 +102,7 @@ task generateJaxbClasses() {
     doLast {
         ant.taskdef(name: "xjc", classname:"com.sun.tools.xjc.XJCTask", classpath:configurations.generateJAXB.asPath)
         ant.xjc(destdir:"${generatedDir}", package: "com.cnp.sdk.generate", binding:bindingsFile, extension:'true'){
-            schema(dir:"src/main/xsd/", includes:"chargeback-api-v2.1.xsd")
+            schema(dir:"src/main/xsd/", includes:"chargeback-api-v${SCHEMA_VERSION}.xsd")
         }
     }
 }
