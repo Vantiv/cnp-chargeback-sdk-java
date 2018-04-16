@@ -78,7 +78,7 @@ public class TestChargebackDocument {
         when(mockedCommunication.httpPutDocumentRequest(any(File.class), matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
 
         cbk.setCommunication(mockedCommunication);
-        ChargebackDocumentUploadResponse response = cbk.replaceDocument(123000L, documentToUpload);
+        ChargebackDocumentUploadResponse response = cbk.replaceDocument(123000L, "logo.tiff", documentToUpload);
         assertEquals("000", response.getResponseCode());
         assertEquals("Success", response.getResponseMessage());
     }
