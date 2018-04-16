@@ -1,2 +1,2 @@
-rootProject.name = 'cnp-chargeback-com.cnp.sdk-java'
+rootProject.name = 'cnp-chargeback-sdk-java'
 rootProject.buildFileName = 'build.gradle'
