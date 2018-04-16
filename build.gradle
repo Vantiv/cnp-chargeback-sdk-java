@@ -126,7 +126,7 @@ task testFunctional(type:Test, dependsOn: functionalTestClasses){
 //}
 
 task copyJarToKit(type:Copy, dependsOn:[check,jar]){
-    from "${DIST_DIR_15}/lib/cnp-sdk-for-java-${JAR_VERSION}.jar"
+    from "${DIST_DIR_15}/lib/cnp-chargeback-sdk-java-${JAR_VERSION}.jar"
     from "LICENSE"
     into KIT_DIR
 }
