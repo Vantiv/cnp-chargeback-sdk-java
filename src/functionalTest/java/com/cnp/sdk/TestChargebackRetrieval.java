@@ -32,7 +32,7 @@ public class TestChargebackRetrieval {
 
     @Test
     public void testActivityByActionable(){
-        ChargebackRetrievalResponse response = cbk.getActivityByActionable(true);
+        ChargebackRetrievalResponse response = cbk.getActionableChargebacks(true);
         assertNotNull(response.getTransactionId());
         ChargebackApiCase case1 = response.getChargebackCases().get(0);
         assertNotNull(case1);
@@ -41,7 +41,7 @@ public class TestChargebackRetrieval {
 
     @Test
     public void testActivityByCaseId(){
-        ChargebackRetrievalResponse response = cbk.getActivityByCaseId(123L);
+        ChargebackRetrievalResponse response = cbk.getChargebackByCaseId(123L);
         assertNotNull(response.getTransactionId());
         ChargebackApiCase case1 = response.getChargebackCases().get(0);
         assertNotNull(case1);
@@ -50,7 +50,7 @@ public class TestChargebackRetrieval {
 
     @Test
     public void testActivityByToken(){
-        ChargebackRetrievalResponse response = cbk.getActivityByToken("00000");
+        ChargebackRetrievalResponse response = cbk.getChargebacksByToken("00000");
         assertNotNull(response.getTransactionId());
         ChargebackApiCase case1 = response.getChargebackCases().get(0);
         assertNotNull(case1);
@@ -60,7 +60,7 @@ public class TestChargebackRetrieval {
 
     @Test
     public void testActivityByCardNum(){
-        ChargebackRetrievalResponse response = cbk.getActivityByCardNum("1111000011110000", "01-18");
+        ChargebackRetrievalResponse response = cbk.getChargebacksByCardNumber("1111000011110000", "01-18");
         assertNotNull(response.getTransactionId());
         ChargebackApiCase case1 = response.getChargebackCases().get(0);
         assertNotNull(case1);
@@ -69,7 +69,7 @@ public class TestChargebackRetrieval {
 
     @Test
     public void testActivityByARN(){
-        ChargebackRetrievalResponse response = cbk.getActivityByARN("000000000");
+        ChargebackRetrievalResponse response = cbk.getChargebacksByARN("000000000");
         assertNotNull(response.getTransactionId());
         ChargebackApiCase case1 = response.getChargebackCases().get(0);
         assertNotNull(case1);
@@ -79,7 +79,7 @@ public class TestChargebackRetrieval {
     @Test
     public void testErrorResponse(){
         try{
-            ChargebackRetrievalResponse response = cbk.getActivityByCaseId(404L);
+            ChargebackRetrievalResponse response = cbk.getChargebackByCaseId(404L);
             fail("Expected Exception");
         } catch (ChargebackException e){
             assertEquals("404 : Not Found - Could not find requested object.", e.getMessage());

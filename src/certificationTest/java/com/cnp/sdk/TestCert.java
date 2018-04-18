@@ -127,7 +127,7 @@ public class TestCert {
     @Test
     public void test5_2(){
         try{
-            cbkRetrieval.getActivityByCaseId(1234L);
+            cbkRetrieval.getChargebackByCaseId(1234L);
             fail("Expected Exception");
         } catch(ChargebackException e){
             assertEquals("404 : Not Found - Could not find requested object.", e.getMessage());
@@ -229,12 +229,12 @@ public class TestCert {
     }
 
     private Long getCaseIdForArn(String arn){
-        ChargebackRetrievalResponse retrievalResponse = cbkRetrieval.getActivityByARN(arn);
+        ChargebackRetrievalResponse retrievalResponse = cbkRetrieval.getChargebacksByARN(arn);
         return retrievalResponse.getChargebackCases().get(0).getCaseId();
     }
 
     private ChargebackApiActivity getLastActivity(Long caseId){
-        ChargebackRetrievalResponse retrievalResponse = cbkRetrieval.getActivityByCaseId(caseId);
+        ChargebackRetrievalResponse retrievalResponse = cbkRetrieval.getChargebackByCaseId(caseId);
         ChargebackApiCase caseAfter = retrievalResponse.getChargebackCases().get(0);
         List<ChargebackApiActivity> activitiesAfter = caseAfter.getActivities();
         return activitiesAfter.get(0);

@@ -5,8 +5,6 @@ import com.cnp.sdk.generate.ChargebackRetrievalResponse;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
@@ -200,7 +198,7 @@ public class TestChargebackRetrieval {
         when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
 
         cbk.setCommunication(mockedCommunication);
-        ChargebackRetrievalResponse response = cbk.getActivityByActionable(true);
+        ChargebackRetrievalResponse response = cbk.getActionableChargebacks(true);
         assertNotNull(response.getTransactionId());
         ChargebackApiCase case1 = response.getChargebackCases().get(0);
         assertNotNull(case1);
@@ -260,7 +258,7 @@ public class TestChargebackRetrieval {
         when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
 
         cbk.setCommunication(mockedCommunication);
-        ChargebackRetrievalResponse response = cbk.getActivityByCaseId(123L);
+        ChargebackRetrievalResponse response = cbk.getChargebackByCaseId(123L);
         assertNotNull(response.getTransactionId());
         ChargebackApiCase case1 = response.getChargebackCases().get(0);
         assertNotNull(case1);
@@ -320,7 +318,7 @@ public class TestChargebackRetrieval {
         when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
 
         cbk.setCommunication(mockedCommunication);
-        ChargebackRetrievalResponse response = cbk.getActivityByToken("00000");
+        ChargebackRetrievalResponse response = cbk.getChargebacksByToken("00000");
         assertNotNull(response.getTransactionId());
         ChargebackApiCase case1 = response.getChargebackCases().get(0);
         assertNotNull(case1);
@@ -381,7 +379,7 @@ public class TestChargebackRetrieval {
         when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
 
         cbk.setCommunication(mockedCommunication);
-        ChargebackRetrievalResponse response = cbk.getActivityByCardNum("1111000011110000", "0118");
+        ChargebackRetrievalResponse response = cbk.getChargebacksByCardNumber("1111000011110000", "0118");
         assertNotNull(response.getTransactionId());
         ChargebackApiCase case1 = response.getChargebackCases().get(0);
         assertNotNull(case1);
@@ -441,7 +439,7 @@ public class TestChargebackRetrieval {
         when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
 
         cbk.setCommunication(mockedCommunication);
-        ChargebackRetrievalResponse response = cbk.getActivityByARN("000000000");
+        ChargebackRetrievalResponse response = cbk.getChargebacksByARN("000000000");
         assertNotNull(response.getTransactionId());
         ChargebackApiCase case1 = response.getChargebackCases().get(0);
         assertNotNull(case1);
@@ -456,6 +454,6 @@ public class TestChargebackRetrieval {
         when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl), any(Properties.class))).thenThrow(new ChargebackException("500:Error"));
 
         cbk.setCommunication(mockedCommunication);
-        ChargebackRetrievalResponse response = cbk.getActivityByCaseId(500L);
+        ChargebackRetrievalResponse response = cbk.getChargebackByCaseId(500L);
     }
 }

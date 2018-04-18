@@ -43,7 +43,7 @@ public class TestChargebackUpdate {
     }
 
     @Test
-    public void testChargebackRespondToUpdateRequest(){
+    public void testChargebackRespondToRetrievalRequest(){
         ChargebackUpdateResponse response = cbk.respondToRetrievalRequest(123L, "Test responded to Update request");
         assertNotNull(response.getTransactionId());
     }
@@ -57,7 +57,7 @@ public class TestChargebackUpdate {
     @Test
     public void testErrorResponse(){
         try{
-            ChargebackUpdateResponse response = cbk.addNoteToCase(404L, "ErrorResponse");
+            cbk.addNoteToCase(404L, "ErrorResponse");
             fail("Expected Exception");
         } catch (ChargebackException e){
             assertEquals("404 : Not Found - Could not find requested object.", e.getMessage());

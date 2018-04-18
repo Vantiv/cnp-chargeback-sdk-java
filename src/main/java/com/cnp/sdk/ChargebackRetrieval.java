@@ -67,23 +67,23 @@ public class ChargebackRetrieval {
         return getRetrievalResponse("date", yyyy_mm_dd, "financialOnly", impact.toString());
     }
 
-    public ChargebackRetrievalResponse getActivityByActionable(Boolean actionable){
+    public ChargebackRetrievalResponse getActionableChargebacks(Boolean actionable){
         return getRetrievalResponse("actionable", actionable.toString());
     }
 
-    public ChargebackRetrievalResponse getActivityByCaseId(Long caseId) {
+    public ChargebackRetrievalResponse getChargebackByCaseId(Long caseId) {
         return sendRetrievalRequest("/" + String.valueOf(caseId));
     }
 
-    public ChargebackRetrievalResponse getActivityByToken(String token){
+    public ChargebackRetrievalResponse getChargebacksByToken(String token){
         return getRetrievalResponse("token", token);
     }
 
-    public ChargebackRetrievalResponse getActivityByCardNum(String cardNum, String mmyy){
+    public ChargebackRetrievalResponse getChargebacksByCardNumber(String cardNum, String mmyy){
         return getRetrievalResponse("cardNumber", cardNum, "expirationDate", mmyy);
     }
 
-    public ChargebackRetrievalResponse getActivityByARN(String arn){
+    public ChargebackRetrievalResponse getChargebacksByARN(String arn){
         return getRetrievalResponse("arn", arn);
     }
 
