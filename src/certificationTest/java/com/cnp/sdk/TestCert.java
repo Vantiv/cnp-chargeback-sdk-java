@@ -80,11 +80,11 @@ public class TestCert {
     public void test3_1(){
         Long caseId = getCaseIdForArn("2222222222");
 
-        ChargebackUpdateResponse updateResponse = cbkUpdate.representCase(caseId, "Cert test3_1");
+        cbkUpdate.representCase(caseId, "Cert test3_1");
 
         ChargebackApiActivity activity = getLastActivity(caseId);
 
-        assertEquals("Merchant Represent", activity.getActivityType());
+        assertEquals(ACTIVITY_MERCHANT_REPRESENT, activity.getActivityType());
         assertEquals("Cert test3_1", activity.getNotes());
 
     }
@@ -93,7 +93,7 @@ public class TestCert {
     public void test3_2(){
         Long caseId = getCaseIdForArn("3333333333");
 
-        ChargebackUpdateResponse updateResponse = cbkUpdate.representCase(caseId, 10027L,"Cert test3_2");
+        cbkUpdate.representCase(caseId, 10027L,"Cert test3_2");
 
         ChargebackApiActivity activity = getLastActivity(caseId);
 
@@ -108,7 +108,7 @@ public class TestCert {
         //test4
         Long caseId = getCaseIdForArn("4444444444");
 
-        ChargebackUpdateResponse updateResponse = cbkUpdate.assumeLiability(caseId, "Cert test4");
+        cbkUpdate.assumeLiability(caseId, "Cert test4");
 
         ChargebackApiActivity activity = getLastActivity(caseId);
 
@@ -117,7 +117,7 @@ public class TestCert {
 
         //test5_1
         try{
-            updateResponse = cbkUpdate.assumeLiability(caseId, "Cert test5_1");
+            cbkUpdate.assumeLiability(caseId, "Cert test5_1");
             fail("Expected Exception");
         } catch(ChargebackException e){
             assertEquals("400 : Bad Request - Cannot perform activity <Merchant Accepts Liability> for case <" + caseId + "> in queue <Merchant Assumed>", e.getMessage());
@@ -127,7 +127,7 @@ public class TestCert {
     @Test
     public void test5_2(){
         try{
-            ChargebackRetrievalResponse retrievalResponse1 = cbkRetrieval.getActivityByCaseId(1234L);
+            cbkRetrieval.getActivityByCaseId(1234L);
             fail("Expected Exception");
         } catch(ChargebackException e){
             assertEquals("404 : Not Found - Could not find requested object.", e.getMessage());
@@ -138,7 +138,7 @@ public class TestCert {
     public void test6_1(){
         Long caseId = getCaseIdForArn("5555555550");
 
-        ChargebackUpdateResponse updateResponse = cbkUpdate.representCase(caseId, "Cert test6_1");
+        cbkUpdate.representCase(caseId, "Cert test6_1");
 
         ChargebackApiActivity activity = getLastActivity(caseId);
 
@@ -150,7 +150,7 @@ public class TestCert {
     public void test6_2(){
         Long caseId = getCaseIdForArn("5555555551");
 
-        ChargebackUpdateResponse updateResponse = cbkUpdate.representCase(caseId, 10051L,"Cert test6_2");
+        cbkUpdate.representCase(caseId, 10051L,"Cert test6_2");
 
         ChargebackApiActivity activity = getLastActivity(caseId);
 
@@ -164,7 +164,7 @@ public class TestCert {
         //test4
         Long caseId = getCaseIdForArn("5555555552");
 
-        ChargebackUpdateResponse updateResponse = cbkUpdate.assumeLiability(caseId, "Cert test7");
+        cbkUpdate.assumeLiability(caseId, "Cert test7");
 
         ChargebackApiActivity activity = getLastActivity(caseId);
 
@@ -177,7 +177,7 @@ public class TestCert {
         //test4
         Long caseId = getCaseIdForArn("6666666660");
 
-        ChargebackUpdateResponse updateResponse = cbkUpdate.assumeLiability(caseId, "Cert test8");
+        cbkUpdate.assumeLiability(caseId, "Cert test8");
 
         ChargebackApiActivity activity = getLastActivity(caseId);
 
@@ -189,7 +189,7 @@ public class TestCert {
     public void test9_1(){
         Long caseId = getCaseIdForArn("7777777770");
 
-        ChargebackUpdateResponse updateResponse = cbkUpdate.representCase(caseId, "Cert test9_1");
+        cbkUpdate.representCase(caseId, "Cert test9_1");
 
         ChargebackApiActivity activity = getLastActivity(caseId);
 
@@ -201,7 +201,7 @@ public class TestCert {
     public void test9_2(){
         Long caseId = getCaseIdForArn("7777777771");
 
-        ChargebackUpdateResponse updateResponse = cbkUpdate.representCase(caseId, 10071L,"Cert test9_2");
+        cbkUpdate.representCase(caseId, 10071L,"Cert test9_2");
 
         ChargebackApiActivity activity = getLastActivity(caseId);
 
@@ -215,7 +215,7 @@ public class TestCert {
         //test4
         Long caseId = getCaseIdForArn("7777777772");
 
-        ChargebackUpdateResponse updateResponse = cbkUpdate.assumeLiability(caseId, "Cert test10");
+        cbkUpdate.assumeLiability(caseId, "Cert test10");
 
         ChargebackApiActivity activity = getLastActivity(caseId);
 

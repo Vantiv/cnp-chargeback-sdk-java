@@ -114,7 +114,7 @@ public class TestCertDocumentation {
 
     @Test
     public void test3(){
-        Long caseId = Long.valueOf(merchantId + "004");
+        Long caseId = Long.valueOf(merchantId + "003");
         ChargebackDocumentUploadResponse documentResponse = cbkDocument.uploadDocument(caseId, documentToUpload1);
         assertEquals("004", documentResponse.getResponseCode());
         assertEquals("Case Not In Merchant Queue", documentResponse.getResponseMessage());
