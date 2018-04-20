@@ -132,7 +132,7 @@ public class TestCertDocumentation {
 
         maxsize = new File("maxsize1.tif");
         try (FileOutputStream out = new FileOutputStream(maxsize)) {
-            byte[] bytes = new byte[2050];
+            byte[] bytes = new byte[2050000];
             new SecureRandom().nextBytes(bytes);
             out.write(bytes);
         } catch(IOException e){
@@ -140,7 +140,7 @@ public class TestCertDocumentation {
         }
 
         documentResponse = cbkDocument.uploadDocument(caseId, maxsize);
-        assertEquals("005", documentResponse.getResponseCode());
+        assertEquals("012", documentResponse.getResponseCode());
         assertEquals("Filesize exceeds limit of 1MB", documentResponse.getResponseMessage());
         maxsize.delete();
 
