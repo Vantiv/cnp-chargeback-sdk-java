@@ -1,5 +1,12 @@
 = Vantiv eCommerce Chargeback SDK CHANGELOG
 
-== Version 2.1.0 (April 12, 2018)
+== Version 2.1.1 (April 12, 2018)
+* Renamed functions:
+  getActivityByActionable => getActionableChargebacks
+  getActivityByCaseId     => getChargebackByCaseId
+  getActivityByToken      => getChargebacksByToken
+  getActivityByCardNum    => getChargebacksByCardNumber
+  getActivityByARN        => getChargebacksByARN
 
+== Version 2.1.0 (April 12, 2018)
 * Initial release
