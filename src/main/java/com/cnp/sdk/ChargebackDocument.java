@@ -46,7 +46,7 @@ public class ChargebackDocument {
      */
     public ChargebackDocument(Properties config) {
         this.config = config;
-        communication = new Communication();
+        communication = new Communication(config);
         baseUrl = config.getProperty("url");
     }
 
@@ -61,27 +61,27 @@ public class ChargebackDocument {
 
     public ChargebackDocumentUploadResponse uploadDocument(Long caseId, File document){
         String requestUrl = baseUrl + "/upload/" + caseId + "/" + document.getName();
-        return communication.httpPostDocumentRequest(document, requestUrl, config);
+        return communication.httpPostDocumentRequest(document, requestUrl);
     }
 
     public File retrieveDocument(Long caseId, String documentId, String filepath){
         String requestUrl = baseUrl + "/retrieve/" + caseId + "/" + documentId;
-        return communication.httpGetDocumentRequest(filepath, requestUrl, config);
+        return communication.httpGetDocumentRequest(filepath, requestUrl);
     }
 
     public ChargebackDocumentUploadResponse replaceDocument(Long caseId, String documentId, File document){
         String requestUrl = baseUrl + "/replace/" + caseId + "/" + documentId;
-        return communication.httpPutDocumentRequest(document, requestUrl, config);
+        return communication.httpPutDocumentRequest(document, requestUrl);
     }
 
     public ChargebackDocumentUploadResponse removeDocument(Long caseId, String documentId){
         String requestUrl = baseUrl + "/remove/" + caseId + "/" + documentId;
-        return communication.httpDeleteDocumentRequest(requestUrl, config);
+        return communication.httpDeleteDocumentRequest(requestUrl);
     }
 
     public ChargebackDocumentUploadResponse listDocuments(Long caseId){
         String requestUrl = baseUrl + "/list/" + caseId;
-        return communication.httpGetDocumentListRequest(requestUrl, config);
+        return communication.httpGetDocumentListRequest(requestUrl);
     }
 
 }

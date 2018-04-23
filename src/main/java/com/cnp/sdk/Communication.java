@@ -46,8 +46,19 @@ public class Communication {
     private final String ACCEPT_HEADER = "Accept";
     private final String CONNECTION_EXCEPTION_MESSAGE = "Error connecting to Vantiv";
     private final String XML_ENCODING = "UTF-8";
+    private Properties config;
+
+    public Communication(Properties config) {
+        setupCommunication();
+        this.config = config;
+    }
 
     public Communication() {
+        setupCommunication();
+        this.config = (new Configuration()).getProperties();
+    }
+
+    private void setupCommunication(){
         try {
 
             String protocol = getBestProtocol(SSLContext.getDefault().getSupportedSSLParameters().getProtocols());
@@ -101,12 +112,12 @@ public class Communication {
     //                Chargeback service end points:                  //
     ////////////////////////////////////////////////////////////////////
 
-    public File httpGetDocumentRequest(String filepath, String requestUrl, Properties config) {
+    public File httpGetDocumentRequest(String filepath, String requestUrl) {
         File document;
         HttpGet get = new HttpGet(requestUrl);
-        prepareHttpRequest(get, config);
+        prepareHttpRequest(get);
 
-        printToConsole("\nGET request to url: \n", requestUrl, config);
+        printToConsole("\nGET request to url: \n", requestUrl);
 
         try {
             HttpResponse response = httpClient.execute(get);
@@ -120,58 +131,58 @@ public class Communication {
         return document;
     }
 
-    public ChargebackDocumentUploadResponse httpGetDocumentListRequest(String requestUrl, Properties config) {
+    public ChargebackDocumentUploadResponse httpGetDocumentListRequest(String requestUrl) {
         HttpGet get = new HttpGet(requestUrl);
-        printToConsole("\nGET request to url: \n", requestUrl, config);
-        String response = sendHttpRequestToCnp(get, config);
+        printToConsole("\nGET request to url: \n", requestUrl);
+        String response = sendHttpRequestToCnp(get);
         return XMLConverter.generateDocumentResponse(response);
     }
 
-    public ChargebackDocumentUploadResponse httpPostDocumentRequest(File file, String requestUrl, Properties config) {
+    public ChargebackDocumentUploadResponse httpPostDocumentRequest(File file, String requestUrl) {
         HttpPost post = new HttpPost(requestUrl);
         post.setHeader(CONTENT_TYPE_HEADER, getFileContentType(file));
         post.setEntity(new FileEntity(file));
-        printToConsole("\nPOST request to url: \n", requestUrl, config);
-        printToConsole("\nEntity: \n", file.getName(), config);
-        String response = sendHttpRequestToCnp(post, config);
+        printToConsole("\nPOST request to url: \n", requestUrl);
+        printToConsole("\nEntity: \n", file.getName());
+        String response = sendHttpRequestToCnp(post);
         return XMLConverter.generateDocumentResponse(response);
 
     }
 
-    public ChargebackDocumentUploadResponse httpPutDocumentRequest(File file, String requestUrl, Properties config) {
+    public ChargebackDocumentUploadResponse httpPutDocumentRequest(File file, String requestUrl) {
         HttpPut put = new HttpPut(requestUrl);
         put.setHeader(CONTENT_TYPE_HEADER, getFileContentType(file));
         put.setEntity(new FileEntity(file));
-        printToConsole("\nPUT request to url: \n", requestUrl, config);
-        printToConsole("\nEntity: \n", file.getName(), config);
-        String response = sendHttpRequestToCnp(put, config);
+        printToConsole("\nPUT request to url: \n", requestUrl);
+        printToConsole("\nEntity: \n", file.getName());
+        String response = sendHttpRequestToCnp(put);
         return XMLConverter.generateDocumentResponse(response);
     }
 
-    public ChargebackDocumentUploadResponse httpDeleteDocumentRequest(String requestUrl, Properties config) {
+    public ChargebackDocumentUploadResponse httpDeleteDocumentRequest(String requestUrl) {
         HttpDelete delete = new HttpDelete(requestUrl);
-        printToConsole("\nDELETE request to url: \n", requestUrl, config);
-        String response = sendHttpRequestToCnp(delete, config);
+        printToConsole("\nDELETE request to url: \n", requestUrl);
+        String response = sendHttpRequestToCnp(delete);
         return XMLConverter.generateDocumentResponse(response);
     }
 
-    public ChargebackRetrievalResponse httpGetRetrievalRequest(String requestUrl, Properties config) {
+    public ChargebackRetrievalResponse httpGetRetrievalRequest(String requestUrl) {
         HttpGet get = new HttpGet(requestUrl);
         get.setHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_VALUE);
         get.setHeader(ACCEPT_HEADER, CONTENT_TYPE_VALUE);
-        printToConsole("\nGET request to url: \n", requestUrl, config);
-        String response = sendHttpRequestToCnp(get, config);
+        printToConsole("\nGET request to url: \n", requestUrl);
+        String response = sendHttpRequestToCnp(get);
         return XMLConverter.generateRetrievalResponse(response);
     }
 
-    public ChargebackUpdateResponse httpPutUpdateRequest(String xmlRequest, String requestUrl, Properties config) {
+    public ChargebackUpdateResponse httpPutUpdateRequest(String xmlRequest, String requestUrl) {
         HttpPut put = new HttpPut(requestUrl);
         put.setHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_VALUE);
         put.setHeader(ACCEPT_HEADER, CONTENT_TYPE_VALUE);
         put.setEntity(new StringEntity(xmlRequest, XML_ENCODING));
-        printToConsole("\nPUT request to url: \n", requestUrl, config);
-        printToConsole("\nRequest XML: \n", xmlRequest, config);
-        String response = sendHttpRequestToCnp(put, config);
+        printToConsole("\nPUT request to url: \n", requestUrl);
+        printToConsole("\nRequest XML: \n", xmlRequest);
+        String response = sendHttpRequestToCnp(put);
         return XMLConverter.generateUpdateResponse(response);
     }
 
@@ -180,17 +191,17 @@ public class Communication {
     /**
      *  Method to send given HttpRequest to server, after preparing it. Returns response from server
      */
-    private String sendHttpRequestToCnp(HttpRequestBase baseRequest, Properties config){
-        String xmlResponse = execHttpRequest(baseRequest, config);
-        printToConsole("\nResponse XML: \n", xmlResponse, config);
+    private String sendHttpRequestToCnp(HttpRequestBase baseRequest){
+        String xmlResponse = execHttpRequest(baseRequest);
+        printToConsole("\nResponse XML: \n", xmlResponse);
         return xmlResponse;
     }
 
     /**
      *  Method to execute HttpRequest: given http request is sent, and receieved response is returned after validation
      */
-    private String execHttpRequest(HttpRequestBase baseRequest, Properties config){
-        prepareHttpRequest(baseRequest, config);
+    private String execHttpRequest(HttpRequestBase baseRequest){
+        prepareHttpRequest(baseRequest);
         try {
             HttpResponse response = httpClient.execute(baseRequest);
             return validateResponse(response);
@@ -204,7 +215,7 @@ public class Communication {
     /**
      *  Method to prepare HttpRequest: set default headers, configs to given http request
      */
-    private void prepareHttpRequest(HttpRequestBase baseRequest, Properties config){
+    private void prepareHttpRequest(HttpRequestBase baseRequest){
         String proxyHost = config.getProperty("proxyHost");
         String proxyPort = config.getProperty("proxyPort");
         int httpTimeout = Integer.valueOf(config.getProperty("timeout", "6000"));
@@ -336,7 +347,7 @@ public class Communication {
     /**
      *  Method to print xml to console: a prefixMessage is appended to given xml before printing to console
      */
-    private void printToConsole(String prefixMessage, String xml, Properties config){
+    private void printToConsole(String prefixMessage, String xml){
         boolean printxml = "true".equalsIgnoreCase(config.getProperty("printXml"));
         boolean neuterXml = "true".equalsIgnoreCase(config.getProperty("neuterXml"));
         if (printxml) {

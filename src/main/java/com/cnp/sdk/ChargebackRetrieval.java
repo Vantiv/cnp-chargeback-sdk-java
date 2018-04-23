@@ -46,7 +46,7 @@ public class ChargebackRetrieval {
      */
     public ChargebackRetrieval(Properties config) {
         this.config = config;
-        communication = new Communication();
+        communication = new Communication(config);
         baseurl = config.getProperty("url");
     }
 
@@ -122,6 +122,6 @@ public class ChargebackRetrieval {
 
     private ChargebackRetrievalResponse sendRetrievalRequest(String urlSuffix){
         String requestUrl = baseurl + urlSuffix;
-        return communication.httpGetRetrievalRequest(requestUrl, config);
+        return communication.httpGetRetrievalRequest(requestUrl);
     }
 }

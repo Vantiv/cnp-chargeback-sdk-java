@@ -47,7 +47,7 @@ public class ChargebackUpdate {
      */
     public ChargebackUpdate(Properties config) {
         this.config = config;
-        communication = new Communication();
+        communication = new Communication(config);
         baseurl = config.getProperty("url");
     }
 
@@ -117,6 +117,6 @@ public class ChargebackUpdate {
     private ChargebackUpdateResponse getUpdateResponse(Long caseId, ChargebackUpdateRequest request){
         String xmlRequest = XMLConverter.generateUpdateRequest(request);
         String requestUrl = baseurl + caseId;
-        return communication.httpPutUpdateRequest(xmlRequest, requestUrl, config);
+        return communication.httpPutUpdateRequest(xmlRequest, requestUrl);
     }
 }
