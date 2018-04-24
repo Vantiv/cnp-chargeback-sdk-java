@@ -72,7 +72,7 @@ public class TestChargebackRetrieval {
 
         ChargebackRetrievalResponse expectedResponse = XMLConverter.generateRetrievalResponse(mockedResponse);
         Communication mockedCommunication = mock(Communication.class);
-        when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
+        when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl))).thenReturn(expectedResponse);
 
         cbk.setCommunication(mockedCommunication);
         ChargebackRetrievalResponse response = cbk.getChargebacksByDate("2018-01-01");
@@ -133,7 +133,7 @@ public class TestChargebackRetrieval {
 
         ChargebackRetrievalResponse expectedResponse = XMLConverter.generateRetrievalResponse(mockedResponse);
         Communication mockedCommunication = mock(Communication.class);
-        when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
+        when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl))).thenReturn(expectedResponse);
 
         cbk.setCommunication(mockedCommunication);
 
@@ -195,7 +195,7 @@ public class TestChargebackRetrieval {
 
         ChargebackRetrievalResponse expectedResponse = XMLConverter.generateRetrievalResponse(mockedResponse);
         Communication mockedCommunication = mock(Communication.class);
-        when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
+        when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl))).thenReturn(expectedResponse);
 
         cbk.setCommunication(mockedCommunication);
         ChargebackRetrievalResponse response = cbk.getActionableChargebacks(true);
@@ -255,7 +255,7 @@ public class TestChargebackRetrieval {
 
         ChargebackRetrievalResponse expectedResponse = XMLConverter.generateRetrievalResponse(mockedResponse);
         Communication mockedCommunication = mock(Communication.class);
-        when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
+        when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl))).thenReturn(expectedResponse);
 
         cbk.setCommunication(mockedCommunication);
         ChargebackRetrievalResponse response = cbk.getChargebackByCaseId(123L);
@@ -315,7 +315,7 @@ public class TestChargebackRetrieval {
 
         ChargebackRetrievalResponse expectedResponse = XMLConverter.generateRetrievalResponse(mockedResponse);
         Communication mockedCommunication = mock(Communication.class);
-        when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
+        when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl))).thenReturn(expectedResponse);
 
         cbk.setCommunication(mockedCommunication);
         ChargebackRetrievalResponse response = cbk.getChargebacksByToken("00000");
@@ -376,7 +376,7 @@ public class TestChargebackRetrieval {
 
         ChargebackRetrievalResponse expectedResponse = XMLConverter.generateRetrievalResponse(mockedResponse);
         Communication mockedCommunication = mock(Communication.class);
-        when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
+        when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl))).thenReturn(expectedResponse);
 
         cbk.setCommunication(mockedCommunication);
         ChargebackRetrievalResponse response = cbk.getChargebacksByCardNumber("1111000011110000", "0118");
@@ -436,7 +436,7 @@ public class TestChargebackRetrieval {
 
         ChargebackRetrievalResponse expectedResponse = XMLConverter.generateRetrievalResponse(mockedResponse);
         Communication mockedCommunication = mock(Communication.class);
-        when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl), any(Properties.class))).thenReturn(expectedResponse);
+        when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl))).thenReturn(expectedResponse);
 
         cbk.setCommunication(mockedCommunication);
         ChargebackRetrievalResponse response = cbk.getChargebacksByARN("000000000");
@@ -451,7 +451,7 @@ public class TestChargebackRetrieval {
         String expectedRequestUrl = ".*?chargebacks.*?/500";
 
         Communication mockedCommunication = mock(Communication.class);
-        when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl), any(Properties.class))).thenThrow(new ChargebackException("500:Error"));
+        when(mockedCommunication.httpGetRetrievalRequest(matches(expectedRequestUrl))).thenThrow(new ChargebackException("500:Error"));
 
         cbk.setCommunication(mockedCommunication);
         ChargebackRetrievalResponse response = cbk.getChargebackByCaseId(500L);
