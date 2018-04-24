@@ -311,19 +311,15 @@ public class Communication {
      */
     private void validateDocumentResponse(HttpResponse response, String filepath){
         HttpEntity entity = null;
+        String xmlResponse;
         try{
             entity = response.getEntity();
-            if (response.getStatusLine().getStatusCode() != 200) {
-                System.out.println("\n" + EntityUtils.toString(entity, XML_ENCODING));
-                throw new ChargebackException(response.getStatusLine().getStatusCode() + " : " +
-                        response.getStatusLine().getReasonPhrase());
-            }
-
-            if(!"image/tiff".equals(entity.getContentType().getValue())){
-                String xmlResponse = EntityUtils.toString(entity, XML_ENCODING);
+            if (response.getStatusLine().getStatusCode() != 200 || !"image/tiff".equals(entity.getContentType().getValue())) {
+                xmlResponse = EntityUtils.toString(entity, XML_ENCODING);
                 System.out.println("\n" + xmlResponse);
                 ErrorResponse errorResponse = XMLConverter.generateErrorResponse(xmlResponse);
-                throw new ChargebackException(getErrorMessage(errorResponse));
+                throw new ChargebackException(response.getStatusLine().getStatusCode() + " : " +
+                        response.getStatusLine().getReasonPhrase() + " - " + getErrorMessage(errorResponse));
             }
 
             InputStream is = entity.getContent();

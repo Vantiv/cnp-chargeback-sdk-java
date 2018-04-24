@@ -68,7 +68,7 @@ public class TestCert {
     public void test2(){
         Long caseId = getCaseIdForArn("1111111111");
 
-        ChargebackUpdateResponse updateResponse = cbkUpdate.addNoteToCase(caseId, "Cert test2");
+        cbkUpdate.addNoteToCase(caseId, "Cert test2");
 
         ChargebackApiActivity activity = getLastActivity(caseId);
 
