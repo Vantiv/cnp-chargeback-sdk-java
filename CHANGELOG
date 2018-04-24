@@ -1,5 +1,10 @@
 = Vantiv eCommerce Chargeback SDK CHANGELOG
 
+== Version 2.1.2 (April 24, 2018)
+* Fixed error handling for Document Retrieve request
+* Fixed certification test cases
+* Internal code refactoring
+
 == Version 2.1.1 (April 12, 2018)
 * Renamed functions:
   getActivityByActionable => getActionableChargebacks
