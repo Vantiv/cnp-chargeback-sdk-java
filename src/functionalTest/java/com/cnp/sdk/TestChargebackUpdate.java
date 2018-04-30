@@ -59,8 +59,9 @@ public class TestChargebackUpdate {
         try{
             cbk.addNoteToCase(404L, "ErrorResponse");
             fail("Expected Exception");
-        } catch (ChargebackException e){
-            assertEquals("404 : Not Found - Could not find requested object.", e.getMessage());
+        } catch (ChargebackWebException e){
+            assertEquals("Could not find requested object.", e.getMessage());
+            assertEquals("404", e.getCode());
         }
     }
 }

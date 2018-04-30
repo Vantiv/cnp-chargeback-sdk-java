@@ -20,11 +20,12 @@ public class ChargebackRetrieval {
     private Properties config;
     private Communication communication;
     private String baseurl;
+    private final String SERVICE_ROUTE = "/chargebacks";
 
     public ChargebackRetrieval() {
         communication = new Communication();
         config = (new Configuration()).getProperties();
-        baseurl = config.getProperty("url");
+        baseurl = config.getProperty("url") + SERVICE_ROUTE;
     }
 
     /**
@@ -47,7 +48,7 @@ public class ChargebackRetrieval {
     public ChargebackRetrieval(Properties config) {
         this.config = config;
         communication = new Communication(config);
-        baseurl = config.getProperty("url");
+        baseurl = config.getProperty("url") + SERVICE_ROUTE;
     }
 
     public void setCommunication(Communication communication) {

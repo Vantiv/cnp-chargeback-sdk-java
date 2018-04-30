@@ -81,8 +81,9 @@ public class TestChargebackRetrieval {
         try{
             ChargebackRetrievalResponse response = cbk.getChargebackByCaseId(404L);
             fail("Expected Exception");
-        } catch (ChargebackException e){
-            assertEquals("404 : Not Found - Could not find requested object.", e.getMessage());
+        } catch (ChargebackWebException e){
+            assertEquals("Could not find requested object.", e.getMessage());
+            assertEquals("404", e.getCode());
         }
     }
 }

@@ -2,6 +2,10 @@
 
 == Version 2.1.2 (April 24, 2018)
 * Fixed error handling for Document Retrieve request
+* Split exceptions into
+    - ChargebackDocumentException : thrown when there is error in retrieve document
+    - ChargebackWebException : thrown when http status code is not 200 (success)
+    - ChargebackException : thrown when there are any other kinds of exceptions in the SDK
 * Fixed certification test cases
 * Internal code refactoring
 

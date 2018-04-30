@@ -79,10 +79,19 @@ public class TestChargebackDocument {
         assertEquals("Invalid Merchant", response.getResponseMessage());
 
         try{
+            cbk.retrieveDocument(123009L, "logo.tiff", "test.tiff");
+            fail("Expected Exception");
+        } catch (ChargebackDocumentException e){
+            assertEquals("Document Not Found", e.getMessage());
+            assertEquals("009", e.getCode());
+        }
+
+        try{
             cbk.retrieveDocument(123404L, "logo.tiff", "test.tiff");
             fail("Expected Exception");
-        } catch (ChargebackException e){
-            assertEquals("404 : Not Found - Could not find requested object.", e.getMessage());
+        } catch (ChargebackWebException e){
+            assertEquals("Could not find requested object.", e.getMessage());
+            assertEquals("404", e.getCode());
         }
     }
 

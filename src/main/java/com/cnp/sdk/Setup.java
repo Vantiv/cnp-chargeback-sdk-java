@@ -13,10 +13,10 @@ public class Setup {
 
 	/* List of environments for the configuration. */
 	private enum EnvironmentConfiguration {
-		SANDBOX("sandbox", "https://www.testvantivcnp.com/sandbox/new/sandbox/services/chargebacks"),
-		PRELIVE("prelive", "https://services.vantivprelive.com/services/chargebacks"),
-		POSTLIVE("postlive", "https://services.vantivpostlive.com/services/chargebacks"),
-		PRODUCTION("production", "https://services.vantivcnp.com/services/chargebacks"),
+		SANDBOX("sandbox", "https://www.testvantivcnp.com/sandbox/new"),
+		PRELIVE("prelive", "https://services.vantivprelive.com"),
+		POSTLIVE("postlive", "https://services.vantivpostlive.com"),
+		PRODUCTION("production", "https://services.vantivcnp.com"),
 		OTHER("other", "You will be asked for all the values");
 
 		private final String key;

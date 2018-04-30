@@ -21,11 +21,12 @@ public class ChargebackUpdate {
     private Properties config;
     private Communication communication;
     private String baseurl;
+    private final String SERVICE_ROUTE = "/chargebacks";
 
     public ChargebackUpdate() {
         communication = new Communication();
         config = (new Configuration()).getProperties();
-        baseurl = config.getProperty("url");
+        baseurl = config.getProperty("url") + SERVICE_ROUTE;
     }
 
     /**
@@ -48,7 +49,7 @@ public class ChargebackUpdate {
     public ChargebackUpdate(Properties config) {
         this.config = config;
         communication = new Communication(config);
-        baseurl = config.getProperty("url");
+        baseurl = config.getProperty("url") + SERVICE_ROUTE;
     }
 
     public void setCommunication(Communication communication) {
@@ -116,7 +117,7 @@ public class ChargebackUpdate {
 
     private ChargebackUpdateResponse getUpdateResponse(Long caseId, ChargebackUpdateRequest request){
         String xmlRequest = XMLConverter.generateUpdateRequest(request);
-        String requestUrl = baseurl + caseId;
+        String requestUrl = baseurl + "/" + caseId;
         return communication.httpPutUpdateRequest(xmlRequest, requestUrl);
     }
 }

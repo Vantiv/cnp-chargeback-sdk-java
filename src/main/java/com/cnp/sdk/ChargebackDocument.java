@@ -20,11 +20,12 @@ public class ChargebackDocument {
     private Properties config;
     private Communication communication;
     private String baseUrl;
+    private final String SERVICE_ROUTE = "/services/chargebacks";
 
     public ChargebackDocument() {
         communication = new Communication();
         config = (new Configuration()).getProperties();
-        baseUrl = config.getProperty("url");
+        baseUrl = config.getProperty("url") + SERVICE_ROUTE;
     }
 
     /**
@@ -47,7 +48,7 @@ public class ChargebackDocument {
     public ChargebackDocument(Properties config) {
         this.config = config;
         communication = new Communication(config);
-        baseUrl = config.getProperty("url");
+        baseUrl = config.getProperty("url") + SERVICE_ROUTE;
     }
 
     public void setCommunication(Communication communication) {

@@ -42,7 +42,7 @@ public class Communication {
     private CloseableHttpClient httpClient;
     private final int KEEP_ALIVE_DURATION = 8000;
     private final String CONTENT_TYPE_HEADER = "Content-Type";
-    private final String CONTENT_TYPE_VALUE = "application/com.vantivcnp.services-v2+xml";
+    private final String CNP_CONTENT_TYPE = "application/com.vantivcnp.services-v2+xml";
     private final String ACCEPT_HEADER = "Accept";
     private final String CONNECTION_EXCEPTION_MESSAGE = "Error connecting to Vantiv";
     private final String XML_ENCODING = "UTF-8";
@@ -168,8 +168,8 @@ public class Communication {
 
     public ChargebackRetrievalResponse httpGetRetrievalRequest(String requestUrl) {
         HttpGet get = new HttpGet(requestUrl);
-        get.setHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_VALUE);
-        get.setHeader(ACCEPT_HEADER, CONTENT_TYPE_VALUE);
+        get.setHeader(CONTENT_TYPE_HEADER, CNP_CONTENT_TYPE);
+        get.setHeader(ACCEPT_HEADER, CNP_CONTENT_TYPE);
         printToConsole("\nGET request to url: \n", requestUrl);
         String response = sendHttpRequestToCnp(get);
         return XMLConverter.generateRetrievalResponse(response);
@@ -177,8 +177,8 @@ public class Communication {
 
     public ChargebackUpdateResponse httpPutUpdateRequest(String xmlRequest, String requestUrl) {
         HttpPut put = new HttpPut(requestUrl);
-        put.setHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_VALUE);
-        put.setHeader(ACCEPT_HEADER, CONTENT_TYPE_VALUE);
+        put.setHeader(CONTENT_TYPE_HEADER, CNP_CONTENT_TYPE);
+        put.setHeader(ACCEPT_HEADER, CNP_CONTENT_TYPE);
         put.setEntity(new StringEntity(xmlRequest, XML_ENCODING));
         printToConsole("\nPUT request to url: \n", requestUrl);
         printToConsole("\nRequest XML: \n", xmlRequest);
@@ -285,17 +285,21 @@ public class Communication {
         String xmlResponse;
         try{
             entity = response.getEntity();
-            if (response.getStatusLine().getStatusCode() != 200) {
-                xmlResponse = EntityUtils.toString(entity, XML_ENCODING);
-                System.out.println("\n" + xmlResponse);
-                ErrorResponse errorResponse = XMLConverter.generateErrorResponse(xmlResponse);
-                throw new ChargebackException(response.getStatusLine().getStatusCode() + " : " +
-                        response.getStatusLine().getReasonPhrase() + " - " + getErrorMessage(errorResponse));
+            String contentType = entity.getContentType().getValue();
+            int statusCode = response.getStatusLine().getStatusCode();
+            xmlResponse = EntityUtils.toString(entity, XML_ENCODING);
+
+            if (statusCode != 200) {
+                printToConsole("\nErrorResponse: ", xmlResponse);
+                if(contentType.contains(CNP_CONTENT_TYPE)){
+                    ErrorResponse errorResponse = XMLConverter.generateErrorResponse(xmlResponse);
+                    throw new ChargebackWebException(getErrorMessage(errorResponse), String.valueOf(statusCode), errorResponse.getErrors().getErrors());
+                }
+                throw new ChargebackWebException(xmlResponse, String.valueOf(statusCode));
             }
-            xmlResponse = EntityUtils.toString(entity,XML_ENCODING);
         }
         catch (IOException e) {
-            throw new ChargebackException("There was an exception while fetching the response xml.", e);
+            throw new ChargebackWebException("There was an exception while fetching the response xml.", e);
         }
         finally {
             if (entity != null) {
@@ -314,12 +318,25 @@ public class Communication {
         String xmlResponse;
         try{
             entity = response.getEntity();
-            if (response.getStatusLine().getStatusCode() != 200 || !"image/tiff".equals(entity.getContentType().getValue())) {
+            String contentType = entity.getContentType().getValue();
+            int statusCode = response.getStatusLine().getStatusCode();
+
+            if(contentType.contains(CNP_CONTENT_TYPE)) {
                 xmlResponse = EntityUtils.toString(entity, XML_ENCODING);
-                System.out.println("\n" + xmlResponse);
-                ErrorResponse errorResponse = XMLConverter.generateErrorResponse(xmlResponse);
-                throw new ChargebackException(response.getStatusLine().getStatusCode() + " : " +
-                        response.getStatusLine().getReasonPhrase() + " - " + getErrorMessage(errorResponse));
+                printToConsole("\nErrorResponse: ", xmlResponse);
+                if (statusCode != 200) {
+                    ErrorResponse errorResponse = XMLConverter.generateErrorResponse(xmlResponse);
+                    throw new ChargebackWebException(getErrorMessage(errorResponse), String.valueOf(statusCode), errorResponse.getErrors().getErrors());
+                }
+                else{
+                    ChargebackDocumentUploadResponse errorResponse = XMLConverter.generateDocumentResponse(xmlResponse);
+                    throw new ChargebackDocumentException(errorResponse.getResponseMessage(), errorResponse.getResponseCode());
+                }
+            }
+            else if(statusCode != 200){
+                xmlResponse = EntityUtils.toString(entity, XML_ENCODING);
+                printToConsole("\nErrorResponse: ", xmlResponse);
+                throw new ChargebackWebException(xmlResponse, String.valueOf(statusCode));
             }
 
             InputStream is = entity.getContent();
@@ -331,7 +348,7 @@ public class Communication {
             fos.close();
         }
         catch (IOException e) {
-            throw new ChargebackException("There was an exception while fetching the requested document.", e);
+            throw new ChargebackDocumentException("There was an exception while fetching the requested document.", e);
         }
         finally {
             if (entity != null) {
@@ -370,6 +387,14 @@ public class Communication {
     }
 
     private String getErrorMessage(ErrorResponse errorResponse){
-        return errorResponse.getErrors().getErrors().get(0);
+        StringBuilder errorMessage = new StringBuilder();
+        String prefix = "";
+
+        for (String error : errorResponse.getErrors().getErrors()) {
+            errorMessage.append(prefix).append(error);
+            prefix = "\n";
+        }
+
+        return errorMessage.toString();
     }
 }
