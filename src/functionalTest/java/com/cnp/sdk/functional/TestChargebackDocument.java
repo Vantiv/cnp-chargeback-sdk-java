@@ -82,7 +82,7 @@ public class TestChargebackDocument {
         assertEquals("Invalid Merchant", response.getResponseMessage());
 
         try{
-            cbk.retrieveDocument(123000L, "logo.tiff", "test.tiff");
+            cbk.retrieveDocument(123009L, "logo.tiff", "test.tiff");
             fail("Expected Exception");
         } catch (ChargebackDocumentException e){
             assertEquals("Document Not Found", e.getMessage());
@@ -90,7 +90,7 @@ public class TestChargebackDocument {
         }
 
         try{
-            cbk.retrieveDocument(123000L, "logo.tiff", "test.tiff");
+            cbk.retrieveDocument(123404L, "logo.tiff", "test.tiff");
             fail("Expected Exception");
         } catch (ChargebackWebException e){
             assertEquals("Could not find requested object.", e.getMessage());
