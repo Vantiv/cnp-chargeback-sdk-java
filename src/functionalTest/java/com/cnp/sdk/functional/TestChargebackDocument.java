@@ -98,8 +98,9 @@ public class TestChargebackDocument {
         }
     }
 
-    @After
-    public void tearDown(){
-        documentToUpload.delete();
-    }
+//    @After
+//    public void tearDown(){
+//        documentToUpload.delete();
+//    }
+
 }
