@@ -38,26 +38,26 @@ public class TestChargebackDocument {
         documentToUpload.createNewFile();
     }
 
-//    @Test
-//    public void testChargebackUploadDocument(){
-//        ChargebackDocumentUploadResponse response = cbk.uploadDocument(123000L, documentToUpload);
-//        assertEquals("000", response.getResponseCode());
-//        assertEquals("Success", response.getResponseMessage());
-//    }
+    @Test
+    public void testChargebackUploadDocument(){
+        ChargebackDocumentUploadResponse response = cbk.uploadDocument(123000L, documentToUpload);
+        assertEquals("000", response.getResponseCode());
+        assertEquals("Success", response.getResponseMessage());
+    }
 
     @Test
     public void testChargebackRetrieveDocument(){
         File documentToRetrieve = cbk.retrieveDocument(123000L, "logo.tiff", "test.tiff");
         assertTrue(documentToRetrieve.exists());
-        documentToRetrieve.delete();
+        //documentToRetrieve.delete();
     }
 
-//    @Test
-//    public void testChargebackReplaceDocument(){
-//        ChargebackDocumentUploadResponse response = cbk.replaceDocument(123000L, "logo.tiff", documentToUpload);
-//        assertEquals("000", response.getResponseCode());
-//        assertEquals("Success", response.getResponseMessage());
-//    }
+    @Test
+    public void testChargebackReplaceDocument(){
+        ChargebackDocumentUploadResponse response = cbk.replaceDocument(123000L, "logo.tiff", documentToUpload);
+        assertEquals("000", response.getResponseCode());
+        assertEquals("Success", response.getResponseMessage());
+    }
 
     @Test
     public void testChargebackRemoveDocument(){
