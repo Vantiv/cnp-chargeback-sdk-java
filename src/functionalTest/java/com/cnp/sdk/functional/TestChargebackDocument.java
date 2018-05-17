@@ -34,30 +34,30 @@ public class TestChargebackDocument {
         config.setProperty("printXml", "true");
 
         cbk = new ChargebackDocument(config);
-        documentToUpload = new File("/tmp/test.tiff");
+        documentToUpload = new File("test.tiff");
         documentToUpload.createNewFile();
     }
 
-    @Test
-    public void testChargebackUploadDocument(){
-        ChargebackDocumentUploadResponse response = cbk.uploadDocument(123000L, documentToUpload);
-        assertEquals("000", response.getResponseCode());
-        assertEquals("Success", response.getResponseMessage());
-    }
+//    @Test
+//    public void testChargebackUploadDocument(){
+//        ChargebackDocumentUploadResponse response = cbk.uploadDocument(123000L, documentToUpload);
+//        assertEquals("000", response.getResponseCode());
+//        assertEquals("Success", response.getResponseMessage());
+//    }
 
     @Test
     public void testChargebackRetrieveDocument(){
-        File documentToRetrieve = cbk.retrieveDocument(123000L, "logo.tiff", "/tmp/test.tiff");
+        File documentToRetrieve = cbk.retrieveDocument(123000L, "logo.tiff", "test.tiff");
         assertTrue(documentToRetrieve.exists());
         documentToRetrieve.delete();
     }
 
-    @Test
-    public void testChargebackReplaceDocument(){
-        ChargebackDocumentUploadResponse response = cbk.replaceDocument(123000L, "logo.tiff", documentToUpload);
-        assertEquals("000", response.getResponseCode());
-        assertEquals("Success", response.getResponseMessage());
-    }
+//    @Test
+//    public void testChargebackReplaceDocument(){
+//        ChargebackDocumentUploadResponse response = cbk.replaceDocument(123000L, "logo.tiff", documentToUpload);
+//        assertEquals("000", response.getResponseCode());
+//        assertEquals("Success", response.getResponseMessage());
+//    }
 
     @Test
     public void testChargebackRemoveDocument(){
@@ -82,7 +82,7 @@ public class TestChargebackDocument {
         assertEquals("Invalid Merchant", response.getResponseMessage());
 
         try{
-            cbk.retrieveDocument(123009L, "logo.tiff", "/tmp/test.tiff");
+            cbk.retrieveDocument(123009L, "logo.tiff", "test.tiff");
             fail("Expected Exception");
         } catch (ChargebackDocumentException e){
             assertEquals("Document Not Found", e.getMessage());
@@ -90,7 +90,7 @@ public class TestChargebackDocument {
         }
 
         try{
-            cbk.retrieveDocument(123404L, "logo.tiff", "/tmp/test.tiff");
+            cbk.retrieveDocument(123404L, "logo.tiff", "test.tiff");
             fail("Expected Exception");
         } catch (ChargebackWebException e){
             assertEquals("Could not find requested object.", e.getMessage());
