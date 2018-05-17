@@ -32,8 +32,9 @@ public class TestChargebackDocument {
         config.setProperty("username", username);
         config.setProperty("password", password);
         config.setProperty("printXml", "true");
+
         cbk = new ChargebackDocument(config);
-        documentToUpload = new File("test.tiff");
+        documentToUpload = new File("/tmp/test.tiff");
         documentToUpload.createNewFile();
     }
 
@@ -46,7 +47,7 @@ public class TestChargebackDocument {
 
     @Test
     public void testChargebackRetrieveDocument(){
-        File documentToRetrieve = cbk.retrieveDocument(123000L, "logo.tiff", "test.tiff");
+        File documentToRetrieve = cbk.retrieveDocument(123000L, "logo.tiff", "/tmp/test.tiff");
         assertTrue(documentToRetrieve.exists());
         documentToRetrieve.delete();
     }
@@ -81,7 +82,7 @@ public class TestChargebackDocument {
         assertEquals("Invalid Merchant", response.getResponseMessage());
 
         try{
-            cbk.retrieveDocument(123009L, "logo.tiff", "test.tiff");
+            cbk.retrieveDocument(123009L, "logo.tiff", "/tmp/test.tiff");
             fail("Expected Exception");
         } catch (ChargebackDocumentException e){
             assertEquals("Document Not Found", e.getMessage());
@@ -89,7 +90,7 @@ public class TestChargebackDocument {
         }
 
         try{
-            cbk.retrieveDocument(123404L, "logo.tiff", "test.tiff");
+            cbk.retrieveDocument(123404L, "logo.tiff", "/tmp/test.tiff");
             fail("Expected Exception");
         } catch (ChargebackWebException e){
             assertEquals("Could not find requested object.", e.getMessage());
