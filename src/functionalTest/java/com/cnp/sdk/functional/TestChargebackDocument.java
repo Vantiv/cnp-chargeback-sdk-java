@@ -1,5 +1,6 @@
-package com.cnp.sdk;
+package com.cnp.sdk.functional;
 
+import com.cnp.sdk.*;
 import com.cnp.sdk.generate.ChargebackDocumentUploadResponse;
 import com.cnp.sdk.generate.ChargebackUpdateResponse;
 import org.junit.After;
@@ -30,6 +31,7 @@ public class TestChargebackDocument {
         fileInputStream.close();
         config.setProperty("username", username);
         config.setProperty("password", password);
+        config.setProperty("printXml", "true");
         cbk = new ChargebackDocument(config);
         documentToUpload = new File("test.tiff");
         documentToUpload.createNewFile();
@@ -58,7 +60,7 @@ public class TestChargebackDocument {
 
     @Test
     public void testChargebackRemoveDocument(){
-        ChargebackDocumentUploadResponse response = cbk.removeDocument(123000L, "logo.tiff");
+        ChargebackDocumentUploadResponse response = cbk.deleteDocument(123000L, "logo.tiff");
         assertEquals("000", response.getResponseCode());
         assertEquals("Success", response.getResponseMessage());
     }

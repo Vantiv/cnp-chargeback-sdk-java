@@ -1,5 +1,6 @@
-package com.cnp.sdk;
+package com.cnp.sdk.unit;
 
+import com.cnp.sdk.*;
 import com.cnp.sdk.generate.ChargebackDocumentUploadResponse;
 import org.junit.After;
 import org.junit.Before;
@@ -30,7 +31,7 @@ public class TestChargebackDocument {
         documentToUpload.createNewFile();
     }
 
-    @Test
+   @Test
     public void testChargebackUploadDocument(){
         String expectedRequestUrl = ".*?/upload/123000/test.tiff";
         String mockedResponse = "<chargebackDocumentUploadResponse xmlns=\"http://www.vantivcnp.com/chargebacks\">\n" +
@@ -84,8 +85,8 @@ public class TestChargebackDocument {
     }
 
     @Test
-    public void testChargebackRemoveDocument(){
-        String expectedRequestUrl = ".*?/remove/123000/logo.tiff";
+    public void testChargebackDeleteDocument(){
+        String expectedRequestUrl = ".*?/delete/123000/logo.tiff";
         String mockedResponse = "<chargebackDocumentUploadResponse xmlns=\"http://www.vantivcnp.com/chargebacks\">\n" +
                 "  <merchantId>999</merchantId>\n" +
                 "  <caseId>123000</caseId>\n" +
@@ -98,7 +99,7 @@ public class TestChargebackDocument {
         when(mockedCommunication.httpDeleteDocumentRequest(matches(expectedRequestUrl))).thenReturn(expectedResponse);
 
         cbk.setCommunication(mockedCommunication);
-        ChargebackDocumentUploadResponse response = cbk.removeDocument(123000L, "logo.tiff");
+        ChargebackDocumentUploadResponse response = cbk.deleteDocument(123000L, "logo.tiff");
         assertEquals("000", response.getResponseCode());
         assertEquals("Success", response.getResponseMessage());
     }

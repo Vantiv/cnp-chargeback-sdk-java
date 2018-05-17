@@ -1,5 +1,6 @@
-package com.cnp.sdk;
+package com.cnp.sdk.unit;
 
+import com.cnp.sdk.*;
 import com.cnp.sdk.generate.ChargebackApiCase;
 import com.cnp.sdk.generate.ChargebackRetrievalResponse;
 import org.junit.Before;

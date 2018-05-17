@@ -94,7 +94,7 @@ public class TestCertDocumentation {
         assertTrue(documentToRetrieve.exists());
         documentToRetrieve.delete();
 
-        documentResponse = cbkDocument.removeDocument(caseId, documentToUpload2.getName());
+        documentResponse = cbkDocument.deleteDocument(caseId, documentToUpload2.getName());
         assertEquals("000", documentResponse.getResponseCode());
         assertEquals("Success", documentResponse.getResponseMessage());
 

@@ -75,8 +75,8 @@ public class ChargebackDocument {
         return communication.httpPutDocumentRequest(document, requestUrl);
     }
 
-    public ChargebackDocumentUploadResponse removeDocument(Long caseId, String documentId){
-        String requestUrl = baseUrl + "/remove/" + caseId + "/" + documentId;
+    public ChargebackDocumentUploadResponse deleteDocument(Long caseId, String documentId){
+        String requestUrl = baseUrl + "/delete/" + caseId + "/" + documentId;
         return communication.httpDeleteDocumentRequest(requestUrl);
     }
 

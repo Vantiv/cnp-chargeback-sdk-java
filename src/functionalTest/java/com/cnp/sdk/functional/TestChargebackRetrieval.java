@@ -1,5 +1,7 @@
-package com.cnp.sdk;
+package com.cnp.sdk.functional;
 
+import com.cnp.sdk.ChargebackRetrieval;
+import com.cnp.sdk.ChargebackWebException;
 import com.cnp.sdk.generate.ChargebackApiCase;
 import com.cnp.sdk.generate.ChargebackRetrievalResponse;
 import org.junit.Test;

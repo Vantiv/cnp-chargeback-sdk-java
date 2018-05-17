@@ -1,5 +1,6 @@
-package com.cnp.sdk;
+package com.cnp.sdk.unit;
 
+import com.cnp.sdk.CnpContext;
 import com.cnp.sdk.generate.ObjectFactory;
 import org.junit.Test;
 

@@ -1,5 +1,6 @@
-package com.cnp.sdk;
+package com.cnp.sdk.unit;
 
+import com.cnp.sdk.Communication;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -1,5 +1,8 @@
-package com.cnp.sdk;
+package com.cnp.sdk.unit;
 
+import com.cnp.sdk.ChargebackUpdate;
+import com.cnp.sdk.Communication;
+import com.cnp.sdk.XMLConverter;
 import com.cnp.sdk.generate.ChargebackUpdateResponse;
 import org.junit.Test;
 

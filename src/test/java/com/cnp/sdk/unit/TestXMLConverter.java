@@ -1,5 +1,7 @@
-package com.cnp.sdk;
+package com.cnp.sdk.unit;
 
+import com.cnp.sdk.ChargebackException;
+import com.cnp.sdk.XMLConverter;
 import com.cnp.sdk.generate.*;
 import org.junit.Test;
 
