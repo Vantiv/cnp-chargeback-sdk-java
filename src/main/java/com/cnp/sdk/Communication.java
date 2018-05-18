@@ -208,6 +208,10 @@ public class Communication {
         } catch (IOException e) {
             throw new ChargebackException(CONNECTION_EXCEPTION_MESSAGE, e);
         } finally {
+            System.out.println("Headers");
+            for(Header header : baseRequest.getAllHeaders()) {
+                System.out.println(header.getName() +" : "+header.getValue());
+            }
             baseRequest.abort();
         }
     }

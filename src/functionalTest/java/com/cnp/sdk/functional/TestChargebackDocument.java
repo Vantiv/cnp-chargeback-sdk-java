@@ -78,6 +78,7 @@ public class TestChargebackDocument {
     @Test
     public void testErrorResponse(){
         System.out.println("The document to upload" + documentToUpload.getName() + " if its present " + documentToUpload.exists());
+
         ChargebackDocumentUploadResponse response = cbk.uploadDocument(123001L, documentToUpload);
         assertEquals("001", response.getResponseCode());
         assertEquals("Invalid Merchant", response.getResponseMessage());
