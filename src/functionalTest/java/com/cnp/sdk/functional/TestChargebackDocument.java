@@ -69,8 +69,8 @@ public class TestChargebackDocument {
     @Test
     public void testChargebackListDocument(){
         ChargebackDocumentUploadResponse response = cbk.listDocuments(123000L);
-        assertTrue(response.getDocumentIds().contains("logo.jpg"));
-        assertTrue(response.getDocumentIds().contains("doc.jpg"));
+        assertTrue(response.getDocumentIds().contains("logo.tiff"));
+        assertTrue(response.getDocumentIds().contains("doc.tiff"));
         assertEquals("000", response.getResponseCode());
         assertEquals("Success", response.getResponseMessage());
     }
