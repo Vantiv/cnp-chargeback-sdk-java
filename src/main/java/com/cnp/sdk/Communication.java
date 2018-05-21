@@ -248,7 +248,9 @@ public class Communication {
      *  Method to return the content-type for input file
      */
     private String getFileContentType(File file){
-        return new MimetypesFileTypeMap().getContentType(file);
+        MimetypesFileTypeMap mMap = new MimetypesFileTypeMap();
+        mMap.addMimeTypes("image/tiff tiff");
+        return mMap.getContentType(file);
     }
 
     /**
