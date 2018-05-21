@@ -250,6 +250,11 @@ public class Communication {
     private String getFileContentType(File file){
         MimetypesFileTypeMap mMap = new MimetypesFileTypeMap();
         mMap.addMimeTypes("image/tiff tiff");
+        mMap.addMimeTypes("image/png png");
+        mMap.addMimeTypes("image/jpeg jpg jpeg jpe");
+        mMap.addMimeTypes("image/gif gif");
+        mMap.addMimeTypes("application/pdf pdf");
+
         return mMap.getContentType(file);
     }
 
