@@ -1,5 +1,10 @@
 = Vantiv eCommerce Chargeback SDK CHANGELOG
 
+== Version 2.1.3 (May 21, 2018)
+* Fixed issues with the MIME type mapping with the different file extensions
+	- The following MIME types are added(The allowed file extensions in documentation)
+		- tiff, jpeg, png, pdf, gif
+
 == Version 2.1.2 (April 24, 2018)
 * Fixed error handling for Document Retrieve request
 * Split exceptions into

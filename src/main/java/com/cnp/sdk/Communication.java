@@ -249,6 +249,7 @@ public class Communication {
      */
     private String getFileContentType(File file){
         MimetypesFileTypeMap mMap = new MimetypesFileTypeMap();
+        // Version 2.1.3 Changes
         mMap.addMimeTypes("image/tiff tiff");
         mMap.addMimeTypes("image/png png");
         mMap.addMimeTypes("image/jpeg jpg jpeg jpe");
