@@ -62,7 +62,7 @@ public class TestChargebackRetrieval {
 
     @Test
     public void testActivityByCardNum(){
-        ChargebackRetrievalResponse response = cbk.getChargebacksByCardNumber("1111000011110000", "01-18");
+        ChargebackRetrievalResponse response = cbk.getChargebacksByCardNumber("1111000011110000", "0118");
         assertNotNull(response.getTransactionId());
         ChargebackApiCase case1 = response.getChargebackCases().get(0);
         assertNotNull(case1);
