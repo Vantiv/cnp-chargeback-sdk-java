@@ -41,8 +41,8 @@ public class TestChargebackDocument {
     @Test
     public void testChargebackUploadDocument(){
         ChargebackDocumentUploadResponse response = cbk.uploadDocument(123000L, documentToUpload);
-        assertEquals("000", response.getResponseCode());
-        assertEquals("Success", response.getResponseMessage());
+        assertEquals("013", response.getResponseCode());
+        assertEquals("Invalid File Content", response.getResponseMessage());
     }
 
     @Test
@@ -55,8 +55,8 @@ public class TestChargebackDocument {
     @Test
     public void testChargebackReplaceDocument(){
         ChargebackDocumentUploadResponse response = cbk.replaceDocument(123000L, "logo.tiff", documentToUpload);
-        assertEquals("000", response.getResponseCode());
-        assertEquals("Success", response.getResponseMessage());
+        assertEquals("013", response.getResponseCode());
+        assertEquals("Invalid File Content", response.getResponseMessage());
     }
 
     @Test
