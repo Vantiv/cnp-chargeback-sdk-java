@@ -65,7 +65,13 @@ clean {
 
 jacocoTestReport {
     executionData = fileTree(dir:"${buildDir}/jacoco/", include:"*.exec")
+    reports {
+	xml.enabled true
+	html.enabled true
+    }
 }
+
+check.dependsOn jacocoTestReport
 
 jar{
     manifest {
