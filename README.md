@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Vantiv/cnp-chargeback-sdk-java.svg?branch=2.x)](https://travis-ci.org/Vantiv/cnp-chargeback-sdk-java)
+
 Vantiv eCommerce Java Chargeback SDK
 =====================
 
