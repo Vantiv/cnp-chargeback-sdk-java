@@ -5,7 +5,7 @@ notifications:
 env:
  global:
   - BUILD_DIR=`pwd`
-  - CNP_CONFIG_FILE=$BUILD_DIR/.chargeback_SDK_config.properties
+  - CNP_CONFIG_FILE=$BUILD_DIR/chargeback_SDK_config.properties
 script:
  - echo $BUILD_DIR
  - echo $CNP_CONFIG_FILE
