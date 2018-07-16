@@ -1,0 +1,19 @@
+language: java
+notifications:
+ email:
+  - sdksupport@vantiv.com
+env:
+ global:
+  - BUILD_DIR=`pwd`
+script:
+ - echo $BUILD_DIR
+ - export $CNP_CONFIG_FILE=$BUILD_DIR/.chargeback_SDK_config.properties
+ - echo "username=USERNAME" > $CNP_CONFIG_FILE
+ - echo "password=PASSWORD" >> $CNP_CONFIG_FILE
+ - echo "url=https://www.testvantivcnp.com/sandbox" >> $CNP_CONFIG_FILE
+ - echo "timeout=50000" >> $CNP_CONFIG_FILE
+ - echo "printxml=true" >> $CNP_CONFIG_FILE
+ - gradle -Dorg.gradle.warning.mode=summary build kit jacocoTestReport
+after_success:
+ - bash <(curl -s https://codecov.io/bash)
+
